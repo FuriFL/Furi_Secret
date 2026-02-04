@@ -17,10 +17,10 @@ TOLERANCE = 0.10
 # ======================
 TIERS = {
     # ===== U =====
-    "asgore": {"full": "Acerola | King of Monsters", "tier": "U"},
+    "asgore": {"full": "Acerola | King of Monsters", "tier": "U", "value": 200000},
 
     # ===== EX =====
-    "solemn": {"full": "Cross | Butterflies' Funeral", "tier": "EX"},
+    "solemn": {"full": "Cross | Butterflies' Funeral", "tier": "EX", "value": 20000},
 
     # ===== S =====
     "cross": {"full": "Cross", "tier": "S", "value": 10000},
