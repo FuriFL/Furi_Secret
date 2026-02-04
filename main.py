@@ -163,6 +163,21 @@ TIERS = {
     "padoru": {"full": "Padoru", "tier": "C"},
     "headhunter": {"full": "Emperor | Headhunter", "tier": "C"},
     "stop sign bisento": {"full": "Stop Sign | Bisento", "tier": "C"},
+
+    # D
+    "hamon": {"full": "Hamon | Akaza", "tier": "D"},
+    "tw": {"full": "The World", "tier": "D"},
+    "nikyu": {"full": "Nikyu Nikyu no mi Fruit", "tier": "D"},
+    "dio's diary": {"full": "Dio's Diary", "tier": "D"},
+    "cyberware": {"full": "Cyberware", "tier": "D"},
+    "garou": {"full": "Garou | Water Stream Rock Smashing Fist", "tier": "D"},
+    "mochi awk": {"full": "Mochi Mochi no mi | Conqueror", "tier": "D"},
+    "hie": {"full": "Hie Hie no mi Fruit", "tier": "D"},
+    "shinra": {"full": "Shinra Kusakabe", "tier": "D"},
+    "ew": {"full": "Eternal Wing", "tier": "D"},
+    "hof": {"full": "Herrscher of Flamescion", "tier": "D"},
+    "kujo's hat": {"full": "Kujo's Hat", "tier": "D"},
+    "silver egg": {"full": "Silver Egg", "tier": "D"},
 }
 
 # ============
