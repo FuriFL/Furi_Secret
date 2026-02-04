@@ -8,9 +8,9 @@ intents.message_content = True
 client = discord.Client(intents=intents)
 
 # ======================
-# TIERS DATA (จากที่ให้มา)
+# TIERS DATA (รวม U, EX, S, A, B, C) — อย่าให้ตัวละครหายแม้แต่ตัวเดียว
 # KEY: lower-case shorthand หรือคำที่คุณอยากพิมพ์หา
-# value: dict { "full": ชื่อเต็ม, "tier": ระดับ }
+# value: dict { "full": ชื่อเต็ม, "tier": ระดับ, optional "amount": จำนวน }
 # ======================
 TIERS = {
     # ===== U =====
@@ -128,144 +128,41 @@ TIERS = {
     "twf": {"full": "The World : Frozen", "tier": "B"},
     "cdc": {"full": "Crazy Diamond | Crystallized", "tier": "B"},
 
-    # C
-"fingers": {
-    "full": "Sukuna's Cursed Finger",
-    "tier": "C",
-    "amount": 5
-},
-"rusted sword": {
-    "full": "Rusted Sword",
-    "tier": "C"
-},
-"okarun egg": {
-    "full": "Okarun | Egg of All-devouring Darkness",
-    "tier": "C"
-},
-"getothm": {
-    "full": "Suguru Geto | The Hunt Master",
-    "tier": "C"
-},
-"gojo": {
-    "full": "Gojo Satoru",
-    "tier": "C"
-},
-"hog": {
-    "full": "Hogyoku Fragment",
-    "tier": "C"
-},
-"sukuna": {
-    "full": "Ryomen Sukuna",
-    "tier": "C"
-},
-"geto": {
-    "full": "Suguru Geto",
-    "tier": "C"
-},
-"toji": {
-    "full": "Toji Fushiguro",
-    "tier": "C"
-},
-"candy cane": {
-    "full": "Stop Sign | Candy Cane",
-    "tier": "C"
-},
-"oa's grace": {
-    "full": "OA's Grace",
-    "tier": "C"
-},
-"anubis spook": {
-    "full": "Anubis | Spook",
-    "tier": "C"
-},
-"hamon frost": {
-    "full": "Hamon | Frost",
-    "tier": "C"
-},
-"hohe": {
-    "full": "Herrscher of Human Ego",
-    "tier": "C"
-},
-"c-moon": {
-    "full": "C-Moon",
-    "tier": "C"
-},
-"baiken": {
-    "full": "Baiken",
-    "tier": "C"
-},
-"sanji sakurian": {
-    "full": "Sanji (Sakurian)",
-    "tier": "C"
-},
-"okarun": {
-    "full": "Okarun",
-    "tier": "C"
-},
-"ichigo": {
-    "full": "Kurosaki Ichigo",
-    "tier": "C"
-},
-"the red mist": {
-    "full": "The Red Mist",
-    "tier": "C"
-},
-"sanji": {
-    "full": "Sanji",
-    "tier": "C"
-},
-"garou sakurian": {
-    "full": "Garou | Water Stream Rock Smashing Fist (Sakurian)",
-    "tier": "C"
-},
-"arasaka": {
-    "full": "Arasaka Suitcase",
-    "tier": "C"
-},
-"ew rgb": {
-    "full": "Eternal Wing | RGB",
-    "tier": "C"
-},
-"yuta": {
-    "full": "Okkotsu Yuta",
-    "tier": "C"
-},
-"sakuya": {
-    "full": "Sakuya Izayoi",
-    "tier": "C"
-},
-"yuji": {
-    "full": "Itadori Yuji",
-    "tier": "C"
-},
-"lei heng": {
-    "full": "Lei Heng",
-    "tier": "C"
-},
-"stop sign regret": {
-    "full": "Stop Sign | Regret",
-    "tier": "C"
-},
-"bag of presents": {
-    "full": "Bag of Present",
-    "tier": "C",
-    "amount": 5
-},
-"ger": {
-    "full": "Gold Experience Requiem",
-    "tier": "C"
-},
-"padoru": {
-    "full": "Padoru",
-    "tier": "C"
-},
-"headhunter": {
-    "full": "Emperor | Headhunter",
-    "tier": "C"
-},
-"stop sign bisento": {
-    "full": "Stop Sign | Bisento",
-    "tier": "C",
+    # ===== C =====
+    "fingers": {"full": "Sukuna's Cursed Finger", "tier": "C", "amount": 5},
+    "rusted sword": {"full": "Rusted Sword", "tier": "C"},
+    "okarun egg": {"full": "Okarun | Egg of All-devouring Darkness", "tier": "C"},
+    "getothm": {"full": "Suguru Geto | The Hunt Master", "tier": "C"},
+    "gojo": {"full": "Gojo Satoru", "tier": "C"},
+    "hog": {"full": "Hogyoku Fragment", "tier": "C"},
+    "sukuna": {"full": "Ryomen Sukuna", "tier": "C"},
+    "geto": {"full": "Suguru Geto", "tier": "C"},
+    "toji": {"full": "Toji Fushiguro", "tier": "C"},
+    "candy cane": {"full": "Stop Sign | Candy Cane", "tier": "C"},
+    "oa's grace": {"full": "OA's Grace", "tier": "C"},
+    "anubis spook": {"full": "Anubis | Spook", "tier": "C"},
+    "hamon frost": {"full": "Hamon | Frost", "tier": "C"},
+    "hohe": {"full": "Herrscher of Human Ego", "tier": "C"},
+    "c-moon": {"full": "C-Moon", "tier": "C"},
+    "baiken": {"full": "Baiken", "tier": "C"},
+    "sanji sakurian": {"full": "Sanji (Sakurian)", "tier": "C"},
+    "okarun": {"full": "Okarun", "tier": "C"},
+    "ichigo": {"full": "Kurosaki Ichigo", "tier": "C"},
+    "the red mist": {"full": "The Red Mist", "tier": "C"},
+    "sanji": {"full": "Sanji", "tier": "C"},
+    "garou sakurian": {"full": "Garou | Water Stream Rock Smashing Fist (Sakurian)", "tier": "C"},
+    "arasaka": {"full": "Arasaka Suitcase", "tier": "C"},
+    "ew rgb": {"full": "Eternal Wing | RGB", "tier": "C"},
+    "yuta": {"full": "Okkotsu Yuta", "tier": "C"},
+    "sakuya": {"full": "Sakuya Izayoi", "tier": "C"},
+    "yuki": {"full": "Itadori Yuji", "tier": "C"},
+    "lei heng": {"full": "Lei Heng", "tier": "C"},
+    "stop sign regret": {"full": "Stop Sign | Regret", "tier": "C"},
+    "bag of presents": {"full": "Bag of Present", "tier": "C", "amount": 5},
+    "ger": {"full": "Gold Experience Requiem", "tier": "C"},
+    "padoru": {"full": "Padoru", "tier": "C"},
+    "headhunter": {"full": "Emperor | Headhunter", "tier": "C"},
+    "stop sign bisento": {"full": "Stop Sign | Bisento", "tier": "C"},
 }
 
 # ============
@@ -288,6 +185,7 @@ def find_entry_by_query(q: str):
     - exact key match
     - full name match
     - normalized match (ignore case & extra spaces & surrounding punctuation)
+    - partial containment match
     Returns tuple (key, data) or (None, None)
     """
     q_norm = normalize(q)
@@ -354,18 +252,18 @@ async def on_message(message):
         # send tierlist image (must exist in project root)
         try:
             await message.channel.send(file=discord.File("tierlist.png"))
-        except Exception as e:
+        except Exception:
             await message.channel.send("❌ Error sending tierlist image.")
         return
 
     # New command format: expect "find <name>"
     parts = raw.split(" ", 1)
     if parts[0].lower() != "find":
-        await message.channel.send("😡 Please use `@Bot find <name>` to search for a spec/stand, or `@Bot tl` for the tierlist image.")
+        await message.channel.send("❗ Please use `@Bot find <name>` to search for a unit, or `@Bot tl` for the tierlist image.")
         return
 
     if len(parts) < 2 or not parts[1].strip():
-        await message.channel.send("😡 Please provide a name after `find`. Example: `@Bot find vergil`")
+        await message.channel.send("❗ Please provide a name after `find`. Example: `@Bot find vergil`")
         return
 
     query_raw = parts[1].strip()  # keep original casing for display
@@ -380,9 +278,11 @@ async def on_message(message):
             # try to present the shorthand nicely
             display_name = key.title()
         # If user typed the full name, use their typed form (query_raw) as displayed name
-        await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier!")
+        # include amount if present
+        amount_text = f" x{data['amount']}" if data.get("amount") else ""
+        await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier!{amount_text}")
     else:
-        await message.channel.send(f"😭💔 Sorry, I don't know **{query_raw}**")
+        await message.channel.send(f"❌ Sorry, I don't know **{query_raw}**")
 
 
 # ============
