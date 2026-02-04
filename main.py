@@ -66,9 +66,9 @@ TIERS = {
     "troll mask": {"full": "Troll Mask", "tier": "A"},
     "st genderbend": {"full": "Summer Time | Genderbend", "tier": "A"},
     "golden egg": {"full": "Golden Egg", "tier": "A"},
-    "spin candy": {"full": "Spin | Candy", "tier": "A"}
+    "spin candy": {"full": "Spin | Candy", "tier": "A"},
 
-    #B
+    # B
     "ta": {"full": "True Anubis", "tier": "B"},
     "cd pumpkin": {"full": "Crazy Diamond | Pumpkin", "tier": "B"},
     "spoon": {"full": "Stop Sign | Comically Large Spoon", "tier": "B"},
