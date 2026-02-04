@@ -373,7 +373,7 @@ async def on_ready():
         status=discord.Status.online,
         activity=discord.Activity(
             type=discord.ActivityType.watching,
-            name="@Furi find <name>  |  @Furi tl  |  @Furi my <items> for <items>"
+            name="@FuriBOT find <name>  |  @FuriBOT tl  |  @FuriBOT my <items> for <items>"
         )
     )
     print(f"Logged in as {client.user}")
@@ -392,7 +392,7 @@ async def on_message(message):
     raw = message.content.replace(client.user.mention, "").strip()
 
     if not raw:
-        await message.channel.send("❗ Usage: `@Bot find <name>` or `@Bot tl` (tierlist) or `@Bot my <items> for <items>`")
+        await message.channel.send("❗ Usage: `@FuriBOT find <name>` or `@FuriBOT tl` (tierlist) or `@FuriBOT my <items> for <items>`")
         return
 
     # normalize leading spaces and collapse multiple spaces
@@ -416,11 +416,11 @@ async def on_message(message):
     # New command format: expect "find <name>"
     parts = raw.split(" ", 1)
     if parts[0].lower() != "find":
-        await message.channel.send("😡 Please use `@Bot find <name>` to search for a spec/stand, `@Bot tl` for the tierlist image, or `@Bot my <items> for <items>` for W/F/L.")
+        await message.channel.send("😡 Please use `@FuriBOT find <name>` to search for a spec/stand, `@Bot tl` for the tierlist image, or `@Bot my <items> for <items>` for W/F/L.")
         return
 
     if len(parts) < 2 or not parts[1].strip():
-        await message.channel.send("😡 Please provide a name after `find`. Example: `@Bot find ewu`")
+        await message.channel.send("😡 Please provide a name after `find`. Example: `@FuriBOT find ewu`")
         return
 
     query_raw = parts[1].strip()  # keep original casing for display
