@@ -143,7 +143,7 @@ TIERS = {
     "sukuna": {"full": "Ryomen Sukuna", "tier": "C", "value": 380},  
     "geto": {"full": "Suguru Geto", "tier": "C", "value": 320},  
     "toji": {"full": "Toji Fushiguro", "tier": "C", "value": 365},  
-    "candy cane": {"full": "Stop Sign | Candy Cane", "tier": "C", "value": 360},  
+    "stop sign candy cane": {"full": "Stop Sign | Candy Cane", "tier": "C", "value": 360},  
     "oa's grace": {"full": "OA's Grace", "tier": "C", "value": 340},  
     "anubis spook": {"full": "Anubis | Spook", "tier": "C", "value": 400},  
     "hamon frost": {"full": "Hamon | Frost", "tier": "C", "value": 370},  
