@@ -78,7 +78,7 @@ TIERS = {
     "spin candy": {"full": "Spin | Candy", "tier": "A"},
 
     # ===== B =====
-    "ta": {"full": "True Anubis", "tier": "B", 800},
+    "ta": {"full": "True Anubis", "tier": "B", "value": 800},
     "cd pumpkin": {"full": "Crazy Diamond | Pumpkin", "tier": "B", "value": 410},
     "spoon": {"full": "Stop Sign | Comically Large Spoon", "tier": "B", "value": 760},
     "easter egg": {"full": "Easter Egg", "tier": "B", "value": 500},
