@@ -344,9 +344,9 @@ def wfl_command(raw_text: str):
         if diff <= tolerance_value:
             result = "F ⚖️"
         elif my_value > other_value:
-            result = "W 🟢"
+            result = "L 😡"
         else:
-            result = "L 🔴"
+            result = "W 🥰"
 
     # สร้างข้อความผลลัพธ์สวย ๆ
     out_lines = []
