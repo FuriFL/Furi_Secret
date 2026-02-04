@@ -78,13 +78,6 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    @client.event
-async def on_ready():
-    activity = discord.Activity(
-        type=discord.ActivityType.watching,
-        name="@Furi tierlist"
-    )
-
     await client.change_presence(
         status=discord.Status.online,
         activity=activity
