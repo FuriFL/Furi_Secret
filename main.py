@@ -155,7 +155,7 @@ TIERS = {
     "ew rgb": {"full": "Eternal Wing | RGB", "tier": "C"},
     "yuta": {"full": "Okkotsu Yuta", "tier": "C"},
     "sakuya": {"full": "Sakuya Izayoi", "tier": "C"},
-    "yuki": {"full": "Itadori Yuji", "tier": "C"},
+    "yuji": {"full": "Itadori Yuji", "tier": "C"},
     "lei heng": {"full": "Lei Heng", "tier": "C"},
     "stop sign regret": {"full": "Stop Sign | Regret", "tier": "C"},
     "bag of presents": {"full": "Bag of Present", "tier": "C", "amount": 5},
