@@ -15,7 +15,7 @@ TIERS = {
 
     # S
     "cross": {"full": "Cross", "tier": "S"},
-    "uf": {"full": "Undying Flame", "tier": "S"},
+    "uf": {"full": "Undying Flame", "tier": "S"}, "aliases": ["Undying Flame"],
     "vst": {"full": "Valentine Summer Time", "tier": "S"},
     "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S"},
     "mkvol": {"full": "Midknight Vessel of Life", "tier": "S"},
