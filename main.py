@@ -299,7 +299,7 @@ def calc_value(item_list):
 
 def wfl_command(raw_text: str):
     """
-    raw_text ควรเป็นข้อความเต็มหลัง mention เช่น:
+    raw_text ควรเป็นదేశ్หลัง mention เช่น:
       "my ew+hie for kujo's hat+silver egg"
     คืน string ที่จะส่งกลับไปยังช่องแชท
     """
@@ -339,13 +339,16 @@ def wfl_command(raw_text: str):
     if my_value == 0 and other_value == 0:
         result = "F ⚖️"
     else:
-        diff = abs(my_value - other_value)
-        tolerance_value = max(my_value, other_value) * TOLERANCE
-        if diff <= tolerance_value:
+        diff = my_value - other_value
+        # ใช้ความต่างสัมบูรณ์เทียบกับค่าสูงสุดเพื่อตัดสิน
+        tolerance_value = max(abs(my_value), abs(other_value)) * TOLERANCE
+        if abs(diff) <= tolerance_value:
             result = "F ⚖️"
-        elif my_value > other_value:
+        elif diff > 0:
+            # ค่าเราเหนือกว่าเกิน tolerance -> Win
             result = "L 😡"
         else:
+            # ค่าต่ำกว่า -> Lose
             result = "W 🥰"
 
     # สร้างข้อความผลลัพธ์สวย ๆ
@@ -361,6 +364,75 @@ def wfl_command(raw_text: str):
     out_lines.append(f"**Result:** {result}")
 
     return "\n".join(out_lines)
+
+
+# ============
+# tierlist2 helper
+# ============
+def build_tier_messages():
+    """
+    สร้างข้อความแยกตาม Tier ตามลำดับที่ต้องการ แล้วคืน list ของข้อความ
+    ไม่ทำให้ TIERS หาย หรือแก้ข้อมูลต้นฉบับ
+    """
+    # ลำดับที่ต้องการแสดง
+    preferred_order = ["U", "EX", "S", "A", "B", "C", "D", "SSR"]
+
+    # เก็บ unique full names ต่อ tier (รักษาความเรียงตาม TIERS dict)
+    groups = {}
+    for key, data in TIERS.items():
+        tier = data.get("tier", "UNKNOWN")
+        full = data.get("full", key)
+        amount = data.get("amount")
+        display = f"{full}" + (f" x{amount}" if amount else "")
+        groups.setdefault(tier, [])
+        if display not in groups[tier]:
+            groups[tier].append(display)
+
+    # สร้างข้อความตาม preferred order แล้วตามด้วย tier อื่นๆ ถ้ามี
+    messages = []
+    used = set()
+    for t in preferred_order:
+        items = groups.get(t, [])
+        if not items:
+            continue
+        used.add(t)
+        header = f"========**{t} Tier**========\n\n"
+        body = "\n".join(items)
+        messages.append(header + body)
+
+    # any remaining tiers
+    for t, items in groups.items():
+        if t in used:
+            continue
+        header = f"========**{t} Tier**========\n\n"
+        body = "\n".join(items)
+        messages.append(header + body)
+
+    return messages
+
+
+async def send_long_message(channel, text):
+    """
+    ส่งข้อความโดยแยกเป็นชิ้นถ้ายาวเกิน 1900 ตัวอักษร (ปลอดภัยสำหรับ Discord)
+    แยกโดยบรรทัดเพื่อความอ่านง่าย
+    """
+    if len(text) <= 1900:
+        await channel.send(text)
+        return
+
+    lines = text.split("\n")
+    chunk = []
+    size = 0
+    for ln in lines:
+        ln_with_n = ln + "\n"
+        if size + len(ln_with_n) > 1900 and chunk:
+            await channel.send("".join(chunk))
+            chunk = []
+            size = 0
+        chunk.append(ln_with_n)
+        size += len(ln_with_n)
+    if chunk:
+        await channel.send("".join(chunk))
 
 
 # ============
@@ -409,37 +481,3 @@ async def on_message(message):
         try:
             await message.channel.send(file=discord.File("tierlist.png"))
         except Exception:
-            await message.channel.send("💔 Error sending tierlist image.")
-        return
-
-    # New command format: expect "find <name>"
-    parts = raw.split(" ", 1)
-    if parts[0].lower() != "find":
-        await message.channel.send("😡 Please use `@Bot find <name>` to search for a spec/stand, `@Bot tl` for the tierlist image, or `@Bot my <items> for <items>` for W/F/L.")
-        return
-
-    if len(parts) < 2 or not parts[1].strip():
-        await message.channel.send("😡 Please provide a name after `find`. Example: `@Bot find ewu`")
-        return
-
-    query_raw = parts[1].strip()  # keep original casing for display
-    # search using normalized matching
-    key, data = find_entry_by_query(query_raw)
-
-    if key and data:
-        # display the user's typed short form as the prefix (title-cased), but prefer a nicer short name
-        display_name = query_raw
-        # if the matched key is different, prefer showing the key (which is the shorthand)
-        if key and key != normalize(query_raw):
-            # try to present the shorthand nicely
-            display_name = key.title()
-        # include amount if present
-        amount_text = f" x{data['amount']}" if data.get("amount") else ""
-        await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier!{amount_text}")
-    else:
-        await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
-
-# ============
-# run
-# ============
-client.run(os.getenv("TOKEN"))
