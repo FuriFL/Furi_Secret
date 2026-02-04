@@ -131,6 +131,7 @@ TIERS = {
     "mita": {"full": "Shadow The World | Mita", "tier": "B", "value": 410},
     "twf": {"full": "The World : Frozen", "tier": "B", "value": 410},
     "cdc": {"full": "Crazy Diamond | Crystallized", "tier": "B", "value": 410},
+    "Sancho": {"full": "Sancho", "tier": "B", "Value": 400},
 
     #C
     "fingers": {"full": "Sukuna's Cursed Finger", "tier": "C", "amount": 5, "value": 150},  
