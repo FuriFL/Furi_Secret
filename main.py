@@ -23,17 +23,17 @@ TIERS = {
     "solemn": {"full": "Cross | Butterflies' Funeral", "tier": "EX"},
 
     # ===== S =====
-    "cross": {"full": "Cross", "tier": "S", "value": 5000},
-    "uf": {"full": "Undying Flame", "tier": "S", "value": 3650},
-    "vst": {"full": "Valentine Summer Time", "tier": "S", "value": 3555},
-    "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S", "value": 3333},
-    "mkvol": {"full": "Midknight Vessel of Life", "tier": "S", "value": 2850},
-    "mkvolts": {"full": "Midknight Vessel of Life | Taped Shut", "tier": "S", "value": 2900},
-    "mimivol": {"full": "Midknight Vessel of Life | Mimicry", "tier": "S", "value": 2755},
+    "cross": {"full": "Cross", "tier": "S", "value": 10000},
+    "uf": {"full": "Undying Flame", "tier": "S", "value": 7300},
+    "vst": {"full": "Valentine Summer Time", "tier": "S", "value": 7000},
+    "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S", "value": 6520},
+    "mkvol": {"full": "Midknight Vessel of Life", "tier": "S", "value": 4500},
+    "mkvolts": {"full": "Midknight Vessel of Life | Taped Shut", "tier": "S", "value": 4000},
+    "mimivol": {"full": "Midknight Vessel of Life | Mimicry", "tier": "S", "value": 3500},
 
     # ===== A =====
-    "wh": {"full": "Wild Hunt", "tier": "A", "value": 2355},
-    "soc": {"full": "Soul of Cinder", "tier": "A", "value": 2300},
+    "wh": {"full": "Wild Hunt", "tier": "A", "value": 3500},
+    "soc": {"full": "Soul of Cinder", "tier": "A", "value": 3250},
     "nerd": {"full": "Standless | Nerd", "tier": "A", "value": 1700},
     "coco": {"full": "Rainy Time | Coco", "tier": "A", "value": 1700},
     "tuna": {"full": "Anubis Requiem | Tuna", "tier": "A", "value": 2000},
