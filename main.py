@@ -222,11 +222,11 @@ async def on_message(message):
     # New command format: expect "find <name>"
     parts = raw.split(" ", 1)
     if parts[0].lower() != "find":
-        await message.channel.send("❗ Please use `@Bot find <name>` to search for a unit, or `@Bot tl` for the tierlist image.")
+        await message.channel.send("😡 Please use `@Bot find <name>` to search for a spec/stand, or `@Bot tl` for the tierlist image.")
         return
 
     if len(parts) < 2 or not parts[1].strip():
-        await message.channel.send("❗ Please provide a name after `find`. Example: `@Bot find vergil`")
+        await message.channel.send("😡 Please provide a name after `find`. Example: `@Bot find vergil`")
         return
 
     query_raw = parts[1].strip()  # keep original casing for display
@@ -243,7 +243,7 @@ async def on_message(message):
         # If user typed the full name, use their typed form (query_raw) as displayed name
         await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier!")
     else:
-        await message.channel.send(f"❌ Sorry, I don't know **{query_raw}**")
+        await message.channel.send(f"😭💔 Sorry, I don't know **{query_raw}**")
 
 
 # ============
