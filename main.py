@@ -11,7 +11,7 @@ client = discord.Client(intents=intents)
 TOLERANCE = 0.10
 
 # ======================
-# TIERS DATA (รวม U, EX, S, A, B, C, D) - อย่าให้ตัวละครหายแม้แต่ตัวเดียว
+# TIERS DATA (รวม U, EX, S, A, B, C, D) — อย่าให้ตัวละครหายแม้แต่ตัวเดียว
 # KEY: lower-case shorthand หรือคำที่คุณอยากพิมพ์หา
 # value: dict { "full": ชื่อเต็ม, "tier": ระดับ, optional "amount": จำนวน, optional "value": numeric }
 # ======================
@@ -132,49 +132,49 @@ TIERS = {
     "cdc": {"full": "Crazy Diamond | Crystallized", "tier": "B"},
 
     # ===== C =====
-    "fingers": {"full": "Sukuna's Cursed Finger", "tier": "C", "amount": 5, "value": 150},
-    "rusted sword": {"full": "Rusted Sword", "tier": "C", "value": 345},
-    "okarun egg": {"full": "Okarun | Egg of All-devouring Darkness", "tier": "C", "value": 400},
-    "getothm": {"full": "Suguru Geto | The Hunt Master", "tier": "C", "value": 365},
-    "gojo": {"full": "Gojo Satoru", "tier": "C", "value": 380},
-    "hog": {"full": "Hogyoku Fragment", "tier": "C", "value": 70},
-    "sukuna": {"full": "Ryomen Sukuna", "tier": "C", "value": 380},
-    "geto": {"full": "Suguru Geto", "tier": "C", "value": 320},
-    "toji": {"full": "Toji Fushiguro", "tier": "C", "value": 365},
-    "candy cane": {"full": "Stop Sign | Candy Cane", "tier": "C", "value": 360},
-    "oa's grace": {"full": "OA's Grace", "tier": "C", "value": 340},
-    "anubis spook": {"full": "Anubis | Spook", "tier": "C", "value": 400},
-    "hamon frost": {"full": "Hamon | Frost", "tier": "C", "value": 370},
-    "hohe": {"full": "Herrscher of Human Ego", "tier": "C", "value": 360},
-    "c-moon": {"full": "C-Moon", "tier": "C", "value": 340},
-    "baiken": {"full": "Baiken", "tier": "C", "value": 340},
-    "sanji sakurian": {"full": "Sanji (Sakurian)", "tier": "C", "value": 380},
-    "okarun": {"full": "Okarun", "tier": "C", "value": 320},
-    "ichigo": {"full": "Kurosaki Ichigo", "tier": "C", "value": 265},
-    "the red mist": {"full": "The Red Mist", "tier": "C", "value": 265},
-    "sanji": {"full": "Sanji", "tier": "C", "value": 100},
-    "garou sakurian": {"full": "Garou | Water Stream Rock Smashing Fist (Sakurian)", "tier": "C", "value": 150},
-    "arasaka": {"full": "Arasaka Suitcase", "tier": "C", "value": 120},
-    "ew rgb": {"full": "Eternal Wing | RGB", "tier": "C", "value": 125},
-    "yuta": {"full": "Okkotsu Yuta", "tier": "C", "value": 50},
-    "sakuya": {"full": "Sakuya Izayoi", "tier": "C", "value": 50},
-    "yuji": {"full": "Itadori Yuji", "tier": "C", "value": 60},
-    "lei heng": {"full": "Lei Heng", "tier": "C", "value": 220},
-    "stop sign regret": {"full": "Stop Sign | Regret", "tier": "C", "value": 100},
-    "bag of presents": {"full": "Bag of Present", "tier": "C", "amount": 5, "value": 140},
-    "ger": {"full": "Gold Experience Requiem", "tier": "C", "value": 60},
-    "padoru": {"full": "Padoru", "tier": "C", "value": 73},
-    "headhunter": {"full": "Emperor | Headhunter", "tier": "C", "value": 53},
-    "stop sign bisento": {"full": "Stop Sign | Bisento", "tier": "C", "value": 45},
+    "fingers": {"full": "Sukuna's Cursed Finger", "tier": "C", "amount": 5},
+    "rusted sword": {"full": "Rusted Sword", "tier": "C"},
+    "okarun egg": {"full": "Okarun | Egg of All-devouring Darkness", "tier": "C"},
+    "getothm": {"full": "Suguru Geto | The Hunt Master", "tier": "C"},
+    "gojo": {"full": "Gojo Satoru", "tier": "C"},
+    "hog": {"full": "Hogyoku Fragment", "tier": "C"},
+    "sukuna": {"full": "Ryomen Sukuna", "tier": "C"},
+    "geto": {"full": "Suguru Geto", "tier": "C"},
+    "toji": {"full": "Toji Fushiguro", "tier": "C"},
+    "candy cane": {"full": "Stop Sign | Candy Cane", "tier": "C"},
+    "oa's grace": {"full": "OA's Grace", "tier": "C"},
+    "anubis spook": {"full": "Anubis | Spook", "tier": "C"},
+    "hamon frost": {"full": "Hamon | Frost", "tier": "C"},
+    "hohe": {"full": "Herrscher of Human Ego", "tier": "C"},
+    "c-moon": {"full": "C-Moon", "tier": "C"},
+    "baiken": {"full": "Baiken", "tier": "C"},
+    "sanji sakurian": {"full": "Sanji (Sakurian)", "tier": "C"},
+    "okarun": {"full": "Okarun", "tier": "C"},
+    "ichigo": {"full": "Kurosaki Ichigo", "tier": "C"},
+    "the red mist": {"full": "The Red Mist", "tier": "C"},
+    "sanji": {"full": "Sanji", "tier": "C"},
+    "garou sakurian": {"full": "Garou | Water Stream Rock Smashing Fist (Sakurian)", "tier": "C"},
+    "arasaka": {"full": "Arasaka Suitcase", "tier": "C"},
+    "ew rgb": {"full": "Eternal Wing | RGB", "tier": "C"},
+    "yuta": {"full": "Okkotsu Yuta", "tier": "C"},
+    "sakuya": {"full": "Sakuya Izayoi", "tier": "C"},
+    "yuji": {"full": "Itadori Yuji", "tier": "C"},
+    "lei heng": {"full": "Lei Heng", "tier": "C"},
+    "stop sign regret": {"full": "Stop Sign | Regret", "tier": "C"},
+    "bag of presents": {"full": "Bag of Present", "tier": "C", "amount": 5},
+    "ger": {"full": "Gold Experience Requiem", "tier": "C"},
+    "padoru": {"full": "Padoru", "tier": "C"},
+    "headhunter": {"full": "Emperor | Headhunter", "tier": "C"},
+    "stop sign bisento": {"full": "Stop Sign | Bisento", "tier": "C"},
 
     # ===== D =====
-    "hamon": {"full": "Hamon | Akaza", "tier": "D", "value": 40},
-    "tw": {"full": "The World", "tier": "D", "value": 35},
-    "nikyu": {"full": "Nikyu Nikyu no mi Fruit", "tier": "D", "value": 73},
-    "dio's diary": {"full": "Dio's Diary", "tier": "D", "value": 50},
-    "cyberware": {"full": "Cyberware", "tier": "D", "value": 37},
-    "garou": {"full": "Garou | Water Stream Rock Smashing Fist", "tier": "D", "value": 50},
-    "mochi awk": {"full": "Mochi Mochi no mi | Conqueror", "tier": "D", "value": 50},
+    "hamon": {"full": "Hamon | Akaza", "tier": "D"},
+    "tw": {"full": "The World", "tier": "D"},
+    "nikyu": {"full": "Nikyu Nikyu no mi Fruit", "tier": "D"},
+    "dio's diary": {"full": "Dio's Diary", "tier": "D"},
+    "cyberware": {"full": "Cyberware", "tier": "D"},
+    "garou": {"full": "Garou | Water Stream Rock Smashing Fist", "tier": "D"},
+    "mochi awk": {"full": "Mochi Mochi no mi | Conqueror", "tier": "D", "value": 30},
     "hie": {"full": "Hie Hie no mi Fruit", "tier": "D", "value": 30},
     "shinra": {"full": "Shinra Kusakabe", "tier": "D","value": 30},
     "ew": {"full": "Eternal Wing", "tier": "D", "value": 30},
@@ -182,7 +182,7 @@ TIERS = {
     "kujo's hat": {"full": "Kujo's Hat", "tier": "D", "value": 23},
     "silver egg": {"full": "Silver Egg", "tier": "D", "value": 20},
 
-    # (ตัวอย่างพิเศษ - สามารถลบหรือแก้ได้ตามต้องการ)
+    # (ตัวอย่างพิเศษ — สามารถลบหรือแก้ได้ตามต้องการ)
     "bronya": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
     "bronya zaychik": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
     "bronya rand": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
@@ -245,12 +245,12 @@ def parse_multiplier_and_key(raw_item: str):
     """
     รองรับรูปแบบเช่น:
       - "fingers x5"  or "fingers×5" or "fingers x 5"
-      - also supports "namex5" with optional spaces
+      - "5x fingers" (รองรับได้ในอนาคต ถ้าต้องการ ปัจจุบันจะจับแบบหลังไม่บังคับ)
     คืนค่า (normalized_key, multiplier, original_key_string)
     """
     item = raw_item.strip()
     # pattern: name [x|×] number (ท้าย)
-    m = re.search(r"^(.+?)\s*[x×]\s*(\d+)\s*$", item, flags=re.IGNORECASE)
+    m = re.search(r"^(.*?)[\s]*[x×]\s*(\d+)\s*$", item, flags=re.IGNORECASE)
     if m:
         name = m.group(1).strip()
         count = int(m.group(2))
@@ -299,7 +299,7 @@ def calc_value(item_list):
 
 def wfl_command(raw_text: str):
     """
-    raw_text ควรเป็น ихаҭเต็มหลัง mention เช่น:
+    raw_text ควรเป็นข้อความเต็มหลัง mention เช่น:
       "my ew+hie for kujo's hat+silver egg"
     คืน string ที่จะส่งกลับไปยังช่องแชท
     """
@@ -339,16 +339,14 @@ def wfl_command(raw_text: str):
     if my_value == 0 and other_value == 0:
         result = "F ⚖️"
     else:
-        diff = my_value - other_value
-        tolerance_value = max(abs(my_value), abs(other_value)) * TOLERANCE
-        if abs(diff) <= tolerance_value:
+        diff = abs(my_value - other_value)
+        tolerance_value = max(my_value, other_value) * TOLERANCE
+        if diff <= tolerance_value:
             result = "F ⚖️"
-        elif diff > 0:
-            # ค่าเราเหนือกว่าเกิน tolerance -> Win
-            result = "W 🥰"
-        else:
-            # ค่าเราต่ำกว่า -> Lose
+        elif my_value > other_value:
             result = "L 😡"
+        else:
+            result = "W 🥰"
 
     # สร้างข้อความผลลัพธ์สวย ๆ
     out_lines = []
@@ -366,74 +364,6 @@ def wfl_command(raw_text: str):
 
 
 # ============
-# tierlist2 helpers
-# ============
-def build_tier_messages():
-    """
-    สร้างข้อความแยกตาม Tier ตามลำดับที่ต้องการ แล้วคืน list ของข้อความ
-    ไม่ทำให้ TIERS หาย หรือแก้ข้อมูลต้นฉบับ
-    """
-    preferred_order = ["U", "EX", "S", "A", "B", "C", "D", "SSR"]
-
-    # เก็บ unique full names ต่อ tier (รักษาความเรียงตาม TIERS dict)
-    groups = {}
-    for key, data in TIERS.items():
-        tier = data.get("tier", "UNKNOWN")
-        full = data.get("full", key)
-        amount = data.get("amount")
-        display = f"{full}" + (f" x{amount}" if amount else "")
-        groups.setdefault(tier, [])
-        if display not in groups[tier]:
-            groups[tier].append(display)
-
-    # สร้างข้อความตาม preferred order แล้วตามด้วย tier อื่นๆ ถ้ามี
-    messages = []
-    used = set()
-    for t in preferred_order:
-        items = groups.get(t, [])
-        if not items:
-            continue
-        used.add(t)
-        header = f"========**{t} Tier**========\n\n"
-        body = "\n".join(items)
-        messages.append(header + body)
-
-    # any remaining tiers
-    for t, items in groups.items():
-        if t in used:
-            continue
-        header = f"========**{t} Tier**========\n\n"
-        body = "\n".join(items)
-        messages.append(header + body)
-
-    return messages
-
-
-async def send_long_message(channel, text):
-    """
-    ส่งข้อความโดยแยกเป็นชิ้นถ้ายาวเกิน 1900 ตัวอักษร (ปลอดภัยสำหรับ Discord)
-    แยกโดยบรรทัดเพื่อความอ่านง่าย
-    """
-    if len(text) <= 1900:
-        await channel.send(text)
-        return
-
-    lines = text.split("\n")
-    chunk = []
-    size = 0
-    for ln in lines:
-        ln_with_n = ln + "\n"
-        if size + len(ln_with_n) > 1900 and chunk:
-            await channel.send("".join(chunk))
-            chunk = []
-            size = 0
-        chunk.append(ln_with_n)
-        size += len(ln_with_n)
-    if chunk:
-        await channel.send("".join(chunk))
-
-
-# ============
 # events
 # ============
 @client.event
@@ -442,7 +372,7 @@ async def on_ready():
         status=discord.Status.online,
         activity=discord.Activity(
             type=discord.ActivityType.watching,
-            name="@Furi find <name>  |  @Furi tl  |  @Furi my <items> for <items>  |  @Furi tl2"
+            name="@Furi find <name>  |  @Furi tl  |  @Furi my <items> for <items>"
         )
     )
     print(f"Logged in as {client.user}")
@@ -461,22 +391,20 @@ async def on_message(message):
     raw = message.content.replace(client.user.mention, "").strip()
 
     if not raw:
-        await message.channel.send("❗ Usage: `@Bot find <name>` or `@Bot tl` (tierlist) or `@Bot tl2` (text tierlist) or `@Bot my <items> for <items>`")
+        await message.channel.send("❗ Usage: `@Bot find <name>` or `@Bot tl` (tierlist) or `@Bot my <items> for <items>`")
         return
 
     # normalize leading spaces and collapse multiple spaces
     raw = re.sub(r"\s+", " ", raw).strip()
 
-    low = raw.lower()
-
     # ===== WFL command (ต้องเริ่มด้วย my ) =====
-    if low.startswith("my "):
+    if raw.lower().startswith("my "):
         reply = wfl_command(raw)
         await message.channel.send(reply)
         return
 
-    # If user asked for tierlist image (backwards compatible)
-    if low in ["tierlist", "tl"]:
+    # If user asked for tierlist (backwards compatible)
+    if raw.lower() in ["tierlist", "tl"]:
         # send tierlist image (must exist in project root)
         try:
             await message.channel.send(file=discord.File("tierlist.png"))
@@ -484,17 +412,10 @@ async def on_message(message):
             await message.channel.send("💔 Error sending tierlist image.")
         return
 
-    # If user asked for text tierlist (new)
-    if low in ["tierlist2", "tl2"]:
-        messages = build_tier_messages()
-        for m in messages:
-            await send_long_message(message.channel, m)
-        return
-
     # New command format: expect "find <name>"
     parts = raw.split(" ", 1)
     if parts[0].lower() != "find":
-        await message.channel.send("😡 Please use `@Bot find <name>` to search for a spec/stand, `@Bot tl` for the tierlist image, `@Bot tl2` for text tierlist, or `@Bot my <items> for <items>` for W/F/L.")
+        await message.channel.send("😡 Please use `@Bot find <name>` to search for a spec/stand, `@Bot tl` for the tierlist image, or `@Bot my <items> for <items>` for W/F/L.")
         return
 
     if len(parts) < 2 or not parts[1].strip():
@@ -518,9 +439,7 @@ async def on_message(message):
     else:
         await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
 
-
 # ============
 # run
 # ============
 client.run(os.getenv("TOKEN"))
-```0 
