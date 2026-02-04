@@ -179,6 +179,10 @@ TIERS = {
     "kujo's hat": {"full": "Kujo's Hat", "tier": "D", "value": 23},
     "silver egg": {"full": "Silver Egg", "tier": "D", "value": 20},
     "Bronya": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+    "Bronya Zaychik": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+    "Bronya Rand": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+    "Silver Wolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+    "Silverwolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
 }
 
 # ============
