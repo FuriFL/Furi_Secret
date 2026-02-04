@@ -127,6 +127,145 @@ TIERS = {
     "mita": {"full": "Shadow The World | Mita", "tier": "B"},
     "twf": {"full": "The World : Frozen", "tier": "B"},
     "cdc": {"full": "Crazy Diamond | Crystallized", "tier": "B"},
+
+    # C
+"fingers": {
+    "full": "Sukuna's Cursed Finger",
+    "tier": "C",
+    "amount": 5
+},
+"rusted sword": {
+    "full": "Rusted Sword",
+    "tier": "C"
+},
+"okarun egg": {
+    "full": "Okarun | Egg of All-devouring Darkness",
+    "tier": "C"
+},
+"getothm": {
+    "full": "Suguru Geto | The Hunt Master",
+    "tier": "C"
+},
+"gojo": {
+    "full": "Gojo Satoru",
+    "tier": "C"
+},
+"hog": {
+    "full": "Hogyoku Fragment",
+    "tier": "C"
+},
+"sukuna": {
+    "full": "Ryomen Sukuna",
+    "tier": "C"
+},
+"geto": {
+    "full": "Suguru Geto",
+    "tier": "C"
+},
+"toji": {
+    "full": "Toji Fushiguro",
+    "tier": "C"
+},
+"candy cane": {
+    "full": "Stop Sign | Candy Cane",
+    "tier": "C"
+},
+"oa's grace": {
+    "full": "OA's Grace",
+    "tier": "C"
+},
+"anubis spook": {
+    "full": "Anubis | Spook",
+    "tier": "C"
+},
+"hamon frost": {
+    "full": "Hamon | Frost",
+    "tier": "C"
+},
+"hohe": {
+    "full": "Herrscher of Human Ego",
+    "tier": "C"
+},
+"c-moon": {
+    "full": "C-Moon",
+    "tier": "C"
+},
+"baiken": {
+    "full": "Baiken",
+    "tier": "C"
+},
+"sanji sakurian": {
+    "full": "Sanji (Sakurian)",
+    "tier": "C"
+},
+"okarun": {
+    "full": "Okarun",
+    "tier": "C"
+},
+"ichigo": {
+    "full": "Kurosaki Ichigo",
+    "tier": "C"
+},
+"the red mist": {
+    "full": "The Red Mist",
+    "tier": "C"
+},
+"sanji": {
+    "full": "Sanji",
+    "tier": "C"
+},
+"garou sakurian": {
+    "full": "Garou | Water Stream Rock Smashing Fist (Sakurian)",
+    "tier": "C"
+},
+"arasaka": {
+    "full": "Arasaka Suitcase",
+    "tier": "C"
+},
+"ew rgb": {
+    "full": "Eternal Wing | RGB",
+    "tier": "C"
+},
+"yuta": {
+    "full": "Okkotsu Yuta",
+    "tier": "C"
+},
+"sakuya": {
+    "full": "Sakuya Izayoi",
+    "tier": "C"
+},
+"yuji": {
+    "full": "Itadori Yuji",
+    "tier": "C"
+},
+"lei heng": {
+    "full": "Lei Heng",
+    "tier": "C"
+},
+"stop sign regret": {
+    "full": "Stop Sign | Regret",
+    "tier": "C"
+},
+"bag of presents": {
+    "full": "Bag of Present",
+    "tier": "C",
+    "amount": 5
+},
+"ger": {
+    "full": "Gold Experience Requiem",
+    "tier": "C"
+},
+"padoru": {
+    "full": "Padoru",
+    "tier": "C"
+},
+"headhunter": {
+    "full": "Emperor | Headhunter",
+    "tier": "C"
+},
+"stop sign bisento": {
+    "full": "Stop Sign | Bisento",
+    "tier": "C",
 }
 
 # ============
