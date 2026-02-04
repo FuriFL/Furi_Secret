@@ -178,6 +178,7 @@ TIERS = {
     "hof": {"full": "Herrscher of Flamescion", "tier": "D", "value": 30},
     "kujo's hat": {"full": "Kujo's Hat", "tier": "D", "value": 23},
     "silver egg": {"full": "Silver Egg", "tier": "D", "value": 20},
+    "Bronya": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
 }
 
 # ============
