@@ -190,7 +190,7 @@ TIERS = {
     "bronya rand": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
     "silver wolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
     "silverwolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
-    "Furi": {"full": "Furidamu", "tier": "Bronya's Wife", "value": ??????},
+    "Furi": {"full": "Furidamu", "tier": "Bronya's Wife", "value": 171108},
 }
 
 # ============
