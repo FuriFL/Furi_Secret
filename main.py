@@ -7,6 +7,9 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
+# ตั้งค่านี้เพื่อเปลี่ยน tolerance ได้ (ค่า 0.10 = 10%)
+TOLERANCE = 0.10
+
 # ======================
 # TIERS DATA (รวม U, EX, S, A, B, C, D) — อย่าให้ตัวละครหายแม้แต่ตัวเดียว
 # KEY: lower-case shorthand หรือคำที่คุณอยากพิมพ์หา
@@ -332,12 +335,18 @@ def wfl_command(raw_text: str):
             f"Other: {', '.join(other_unknown) if other_unknown else 'None'}"
         )
 
-    if my_value > other_value:
-        result = "W 🟢"
-    elif my_value < other_value:
-        result = "L 🔴"
-    else:
+    # ===== ผล W / L / F ตาม tolerance =====
+    if my_value == 0 and other_value == 0:
         result = "F ⚖️"
+    else:
+        diff = abs(my_value - other_value)
+        tolerance_value = max(my_value, other_value) * TOLERANCE
+        if diff <= tolerance_value:
+            result = "F ⚖️"
+        elif my_value > other_value:
+            result = "W 🟢"
+        else:
+            result = "L 🔴"
 
     # สร้างข้อความผลลัพธ์สวย ๆ
     out_lines = []
