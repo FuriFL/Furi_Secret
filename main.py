@@ -78,11 +78,6 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    await client.change_presence(
-        status=discord.Status.online,
-        activity=activity
-    )
-    
     if client.user in message.mentions:
         content = message.content.lower()
 
