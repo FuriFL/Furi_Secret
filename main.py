@@ -1,28 +1,34 @@
 import discord
 import os
+import re
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 client = discord.Client(intents=intents)
 
+# ======================
+# TIERS DATA (จากที่ให้มา)
+# KEY: lower-case shorthand หรือคำที่คุณอยากพิมพ์หา
+# value: dict { "full": ชื่อเต็ม, "tier": ระดับ }
+# ======================
 TIERS = {
-    # U
+    # ===== U =====
     "asgore": {"full": "Acerola | King of Monsters", "tier": "U"},
 
-    # EX
+    # ===== EX =====
     "solemn": {"full": "Cross | Butterflies' Funeral", "tier": "EX"},
 
-    # S
+    # ===== S =====
     "cross": {"full": "Cross", "tier": "S"},
-    "uf": {"full": "Undying Flame", "tier": "S"}, "aliases": ["Undying Flame"],
+    "uf": {"full": "Undying Flame", "tier": "S"},
     "vst": {"full": "Valentine Summer Time", "tier": "S"},
     "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S"},
     "mkvol": {"full": "Midknight Vessel of Life", "tier": "S"},
     "mkvolts": {"full": "Midknight Vessel of Life | Taped Shut", "tier": "S"},
     "mimivol": {"full": "Midknight Vessel of Life | Mimicry", "tier": "S"},
 
-    # A
+    # ===== A =====
     "wh": {"full": "Wild Hunt", "tier": "A"},
     "soc": {"full": "Soul of Cinder", "tier": "A"},
     "nerd": {"full": "Standless | Nerd", "tier": "A"},
@@ -68,7 +74,7 @@ TIERS = {
     "golden egg": {"full": "Golden Egg", "tier": "A"},
     "spin candy": {"full": "Spin | Candy", "tier": "A"},
 
-    # B
+    # ===== B =====
     "ta": {"full": "True Anubis", "tier": "B"},
     "cd pumpkin": {"full": "Crazy Diamond | Pumpkin", "tier": "B"},
     "spoon": {"full": "Stop Sign | Comically Large Spoon", "tier": "B"},
@@ -123,39 +129,124 @@ TIERS = {
     "cdc": {"full": "Crazy Diamond | Crystallized", "tier": "B"},
 }
 
+# ============
+# helpers
+# ============
+def normalize(s: str) -> str:
+    """lower, strip spaces, collapse spaces, remove surrounding punctuation"""
+    if s is None:
+        return ""
+    s = s.strip().lower()
+    s = re.sub(r"\s+", " ", s)
+    # remove leading/trailing punctuation
+    s = s.strip(" '\"`.,:;-()[]{}")
+    return s
+
+
+def find_entry_by_query(q: str):
+    """
+    Try to find an entry in TIERS by:
+    - exact key match
+    - full name match
+    - normalized match (ignore case & extra spaces & surrounding punctuation)
+    Returns tuple (key, data) or (None, None)
+    """
+    q_norm = normalize(q)
+
+    # 1) direct key match (exact)
+    if q_norm in TIERS:
+        return q_norm, TIERS[q_norm]
+
+    # 2) try match full names or keys with normalization
+    for key, data in TIERS.items():
+        # check normalized key
+        if normalize(key) == q_norm:
+            return key, data
+        # check normalized full name
+        if normalize(data.get("full", "")) == q_norm:
+            return key, data
+
+    # 3) partial containment (if user typed a smaller phrase)
+    # e.g., user types "vergil" and full is "True Anubis | Vergil" -> match
+    for key, data in TIERS.items():
+        full_norm = normalize(data.get("full", ""))
+        if q_norm in full_norm or full_norm in q_norm:
+            return key, data
+
+    return None, None
+
+
+# ============
+# events
+# ============
 @client.event
 async def on_ready():
     await client.change_presence(
         status=discord.Status.online,
         activity=discord.Activity(
             type=discord.ActivityType.watching,
-            name="@Furi tierlist"
+            name="@Furi find <name>  |  @Furi tl"
         )
     )
     print(f"Logged in as {client.user}")
+
 
 @client.event
 async def on_message(message):
     if message.author.bot:
         return
 
-    if client.user in message.mentions:
-        query = message.content.lower().replace(client.user.mention, "").strip()
+    # only react when bot is mentioned
+    if client.user not in message.mentions:
+        return
 
-        # tierlist / tl
-        if query in ["tierlist", "tl"]:
+    # original content without mention
+    raw = message.content.replace(client.user.mention, "").strip()
+
+    if not raw:
+        await message.channel.send("❗ Usage: `@Bot find <name>` or `@Bot tl` (tierlist)")
+        return
+
+    # normalize leading spaces and collapse multiple spaces
+    raw = re.sub(r"\s+", " ", raw).strip()
+
+    # If user asked for tierlist (backwards compatible)
+    if raw.lower() in ["tierlist", "tl"]:
+        # send tierlist image (must exist in project root)
+        try:
             await message.channel.send(file=discord.File("tierlist.png"))
-            return
+        except Exception as e:
+            await message.channel.send("❌ Error sending tierlist image.")
+        return
 
-        # character tier
-        if query in TIERS:
-            data = TIERS[query]
-            await message.channel.send(
-                f"**{query.title()}** **[{data['full']}]** is on **{data['tier']}** Tier!"
-            )
-        else:
-            await message.channel.send(
-                f"❌ Sorry I don't know what is **{query}**"
-            )
+    # New command format: expect "find <name>"
+    parts = raw.split(" ", 1)
+    if parts[0].lower() != "find":
+        await message.channel.send("❗ Please use `@Bot find <name>` to search for a unit, or `@Bot tl` for the tierlist image.")
+        return
 
+    if len(parts) < 2 or not parts[1].strip():
+        await message.channel.send("❗ Please provide a name after `find`. Example: `@Bot find vergil`")
+        return
+
+    query_raw = parts[1].strip()  # keep original casing for display
+    # search using normalized matching
+    key, data = find_entry_by_query(query_raw)
+
+    if key and data:
+        # display the user's typed short form as the prefix (title-cased), but prefer a nicer short name
+        display_name = query_raw
+        # if the matched key is different, prefer showing the key (which is the shorthand)
+        if key and key != normalize(query_raw):
+            # try to present the shorthand nicely
+            display_name = key.title()
+        # If user typed the full name, use their typed form (query_raw) as displayed name
+        await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier!")
+    else:
+        await message.channel.send(f"❌ Sorry, I don't know **{query_raw}**")
+
+
+# ============
+# run
+# ============
 client.run(os.getenv("TOKEN"))
