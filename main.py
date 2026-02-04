@@ -185,6 +185,58 @@ TIERS = {
     "Silverwolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
 }
 
+def calc_value(item_list):
+    total = 0
+    unknown = []
+
+    for item in item_list:
+        key = item.strip().lower()
+        if key in ITEMS:
+            total += ITEMS[key].get("value", 0)
+        else:
+            unknown.append(item)
+
+    return total, unknown
+
+def wfl_command(message: str):
+    text = message.lower()
+
+    if "my " not in text or " for " not in text:
+        return "❌ Format: my item1+item2 for itemA+itemB"
+
+    try:
+        my_part = text.split("my ")[1].split(" for ")[0]
+        other_part = text.split(" for ")[1]
+    except:
+        return "❌ Invalid format"
+
+    my_items = my_part.split("+")
+    other_items = other_part.split("+")
+
+    my_value, my_unknown = calc_value(my_items)
+    other_value, other_unknown = calc_value(other_items)
+
+    if my_unknown or other_unknown:
+        return (
+            f"⚠️ Unknown items:\n"
+            f"My: {', '.join(my_unknown) if my_unknown else 'None'}\n"
+            f"Other: {', '.join(other_unknown) if other_unknown else 'None'}"
+        )
+
+    if my_value > other_value:
+        result = "W"
+    elif my_value < other_value:
+        result = "L"
+    else:
+        result = "F"
+
+    return (
+        f"Your value: {my_value}\n"
+        f"Other value: {other_value}\n"
+        f"Result: {result}"
+    )
+
+
 # ============
 # helpers
 # ============
