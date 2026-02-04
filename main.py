@@ -8,9 +8,9 @@ intents.message_content = True
 client = discord.Client(intents=intents)
 
 # ======================
-# TIERS DATA (รวม U, EX, S, A, B, C) — อย่าให้ตัวละครหายแม้แต่ตัวเดียว
+# TIERS DATA (รวม U, EX, S, A, B, C, D) — อย่าให้ตัวละครหายแม้แต่ตัวเดียว
 # KEY: lower-case shorthand หรือคำที่คุณอยากพิมพ์หา
-# value: dict { "full": ชื่อเต็ม, "tier": ระดับ, optional "amount": จำนวน }
+# value: dict { "full": ชื่อเต็ม, "tier": ระดับ, optional "amount": จำนวน, optional "value": numeric }
 # ======================
 TIERS = {
     # ===== U =====
@@ -164,7 +164,7 @@ TIERS = {
     "headhunter": {"full": "Emperor | Headhunter", "tier": "C"},
     "stop sign bisento": {"full": "Stop Sign | Bisento", "tier": "C"},
 
-    # D
+    # ===== D =====
     "hamon": {"full": "Hamon | Akaza", "tier": "D"},
     "tw": {"full": "The World", "tier": "D"},
     "nikyu": {"full": "Nikyu Nikyu no mi Fruit", "tier": "D"},
@@ -178,64 +178,14 @@ TIERS = {
     "hof": {"full": "Herrscher of Flamescion", "tier": "D", "value": 30},
     "kujo's hat": {"full": "Kujo's Hat", "tier": "D", "value": 23},
     "silver egg": {"full": "Silver Egg", "tier": "D", "value": 20},
-    "Bronya": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
-    "Bronya Zaychik": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
-    "Bronya Rand": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
-    "Silver Wolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
-    "Silverwolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+
+    # (ตัวอย่างพิเศษ — สามารถลบหรือแก้ได้ตามต้องการ)
+    "bronya": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+    "bronya zaychik": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+    "bronya rand": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+    "silver wolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+    "silverwolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
 }
-
-def calc_value(item_list):
-    total = 0
-    unknown = []
-
-    for item in item_list:
-        key = item.strip().lower()
-        if key in ITEMS:
-            total += ITEMS[key].get("value", 0)
-        else:
-            unknown.append(item)
-
-    return total, unknown
-
-def wfl_command(message: str):
-    text = message.lower()
-
-    if "my " not in text or " for " not in text:
-        return "❌ Format: my item1+item2 for itemA+itemB"
-
-    try:
-        my_part = text.split("my ")[1].split(" for ")[0]
-        other_part = text.split(" for ")[1]
-    except:
-        return "❌ Invalid format"
-
-    my_items = my_part.split("+")
-    other_items = other_part.split("+")
-
-    my_value, my_unknown = calc_value(my_items)
-    other_value, other_unknown = calc_value(other_items)
-
-    if my_unknown or other_unknown:
-        return (
-            f"⚠️ Unknown items:\n"
-            f"My: {', '.join(my_unknown) if my_unknown else 'None'}\n"
-            f"Other: {', '.join(other_unknown) if other_unknown else 'None'}"
-        )
-
-    if my_value > other_value:
-        result = "W"
-    elif my_value < other_value:
-        result = "L"
-    else:
-        result = "F"
-
-    return (
-        f"Your value: {my_value}\n"
-        f"Other value: {other_value}\n"
-        f"Result: {result}"
-    )
-
 
 # ============
 # helpers
@@ -286,6 +236,125 @@ def find_entry_by_query(q: str):
 
 
 # ============
+# value / calc helpers (ใช้ TIERS เป็นแหล่งข้อมูล)
+# ============
+def parse_multiplier_and_key(raw_item: str):
+    """
+    รองรับรูปแบบเช่น:
+      - "fingers x5"  or "fingers×5" or "fingers x 5"
+      - "5x fingers" (รองรับได้ในอนาคต ถ้าต้องการ ปัจจุบันจะจับแบบหลังไม่บังคับ)
+    คืนค่า (normalized_key, multiplier, original_key_string)
+    """
+    item = raw_item.strip()
+    # pattern: name [x|×] number (ท้าย)
+    m = re.search(r"^(.*?)[\s]*[x×]\s*(\d+)\s*$", item, flags=re.IGNORECASE)
+    if m:
+        name = m.group(1).strip()
+        count = int(m.group(2))
+        return normalize(name), count, name
+    # no explicit multiplier
+    return normalize(item), 1, item
+
+
+def calc_value(item_list):
+    """
+    คืนค่า (total_value:int, unknown_items:list[str], details:list[str])
+    details เป็นรายการ "Full name (+value x count = total)" เพื่อแสดงในผลลัพธ์
+    """
+    total = 0
+    unknown = []
+    details = []
+
+    for raw in item_list:
+        if not raw or not raw.strip():
+            continue
+        key_norm, mult, original = parse_multiplier_and_key(raw)
+        key, data = find_entry_by_query(key_norm)
+        if not data:
+            # ยังไม่รู้ชื่อนี้
+            unknown.append(original)
+            continue
+
+        base_value = data.get("value", 0)
+        # ถ้าระบุ amount ใน object (เช่น fingers มี amount=5) ให้คูณด้วย amount ถ้ามีความหมาย
+        amount_defined = data.get("amount")
+        if amount_defined and mult == 1:
+            # ถ้าผู้ใช้ไม่ได้บอก multiplier แต่มี field amount: ให้ใช้ amount เป็น multiplier
+            mult = amount_defined
+
+        item_total = base_value * mult
+        total += item_total
+
+        # details แสดงชัดเจน
+        if mult != 1:
+            details.append(f"{data['full']} x{mult} (+{base_value} each → +{item_total})")
+        else:
+            details.append(f"{data['full']} (+{base_value})")
+
+    return total, unknown, details
+
+
+def wfl_command(raw_text: str):
+    """
+    raw_text ควรเป็นข้อความเต็มหลัง mention เช่น:
+      "my ew+hie for kujo's hat+silver egg"
+    คืน string ที่จะส่งกลับไปยังช่องแชท
+    """
+    text = raw_text.strip()
+    low = text.lower()
+
+    if "my " not in low or " for " not in low:
+        return "❌ Format: `my item1+item2 for itemA+itemB`"
+
+    # แยกส่วนอย่างปลอดภัย
+    try:
+        # หาตำแหน่ง "my " และ " for " แบบ case-insensitive
+        start_my = low.index("my ")
+        start_for = low.rindex(" for ")
+        my_part = text[start_my + 3:start_for].strip()
+        other_part = text[start_for + 5:].strip()
+    except Exception:
+        return "❌ Invalid format (ต้องมี `my` และ `for`)"
+
+    if not my_part or not other_part:
+        return "❌ กรุณาใส่รายการหลัง `my` และ `for`"
+
+    my_items = [i.strip() for i in my_part.split("+") if i.strip()]
+    other_items = [i.strip() for i in other_part.split("+") if i.strip()]
+
+    my_value, my_unknown, my_details = calc_value(my_items)
+    other_value, other_unknown, other_details = calc_value(other_items)
+
+    if my_unknown or other_unknown:
+        return (
+            "⚠️ Unknown items detected:\n"
+            f"My: {', '.join(my_unknown) if my_unknown else 'None'}\n"
+            f"Other: {', '.join(other_unknown) if other_unknown else 'None'}"
+        )
+
+    if my_value > other_value:
+        result = "W 🟢"
+    elif my_value < other_value:
+        result = "L 🔴"
+    else:
+        result = "F ⚖️"
+
+    # สร้างข้อความผลลัพธ์สวย ๆ
+    out_lines = []
+    out_lines.append(f"**Your value:** {my_value}")
+    for d in my_details:
+        out_lines.append(f"• {d}")
+    out_lines.append("")  # blank line
+    out_lines.append(f"**Other value:** {other_value}")
+    for d in other_details:
+        out_lines.append(f"• {d}")
+    out_lines.append("")  # blank line
+    out_lines.append(f"**Result:** {result}")
+
+    return "\n".join(out_lines)
+
+
+# ============
 # events
 # ============
 @client.event
@@ -294,7 +363,7 @@ async def on_ready():
         status=discord.Status.online,
         activity=discord.Activity(
             type=discord.ActivityType.watching,
-            name="@Furi find <name>  |  @Furi tl"
+            name="@Furi find <name>  |  @Furi tl  |  @Furi my <items> for <items>"
         )
     )
     print(f"Logged in as {client.user}")
@@ -313,11 +382,17 @@ async def on_message(message):
     raw = message.content.replace(client.user.mention, "").strip()
 
     if not raw:
-        await message.channel.send("❗ Usage: `@Bot find <name>` or `@Bot tl` (tierlist)")
+        await message.channel.send("❗ Usage: `@Bot find <name>` or `@Bot tl` (tierlist) or `@Bot my <items> for <items>`")
         return
 
     # normalize leading spaces and collapse multiple spaces
     raw = re.sub(r"\s+", " ", raw).strip()
+
+    # ===== WFL command (ต้องเริ่มด้วย my ) =====
+    if raw.lower().startswith("my "):
+        reply = wfl_command(raw)
+        await message.channel.send(reply)
+        return
 
     # If user asked for tierlist (backwards compatible)
     if raw.lower() in ["tierlist", "tl"]:
@@ -331,7 +406,7 @@ async def on_message(message):
     # New command format: expect "find <name>"
     parts = raw.split(" ", 1)
     if parts[0].lower() != "find":
-        await message.channel.send("😡 Please use `@Bot find <name>` to search for a spec/stand, or `@Bot tl` for the tierlist image.")
+        await message.channel.send("😡 Please use `@Bot find <name>` to search for a spec/stand, `@Bot tl` for the tierlist image, or `@Bot my <items> for <items>` for W/F/L.")
         return
 
     if len(parts) < 2 or not parts[1].strip():
@@ -349,13 +424,11 @@ async def on_message(message):
         if key and key != normalize(query_raw):
             # try to present the shorthand nicely
             display_name = key.title()
-        # If user typed the full name, use their typed form (query_raw) as displayed name
         # include amount if present
         amount_text = f" x{data['amount']}" if data.get("amount") else ""
         await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier!{amount_text}")
     else:
-        await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**TT")
-
+        await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
 
 # ============
 # run
