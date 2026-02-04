@@ -171,13 +171,13 @@ TIERS = {
     "dio's diary": {"full": "Dio's Diary", "tier": "D"},
     "cyberware": {"full": "Cyberware", "tier": "D"},
     "garou": {"full": "Garou | Water Stream Rock Smashing Fist", "tier": "D"},
-    "mochi awk": {"full": "Mochi Mochi no mi | Conqueror", "tier": "D"},
-    "hie": {"full": "Hie Hie no mi Fruit", "tier": "D"},
-    "shinra": {"full": "Shinra Kusakabe", "tier": "D"},
-    "ew": {"full": "Eternal Wing", "tier": "D"},
-    "hof": {"full": "Herrscher of Flamescion", "tier": "D"},
-    "kujo's hat": {"full": "Kujo's Hat", "tier": "D"},
-    "silver egg": {"full": "Silver Egg", "tier": "D"},
+    "mochi awk": {"full": "Mochi Mochi no mi | Conqueror", "tier": "D", "value": 30},
+    "hie": {"full": "Hie Hie no mi Fruit", "tier": "D", "value": 30},
+    "shinra": {"full": "Shinra Kusakabe", "tier": "D","value": 30},
+    "ew": {"full": "Eternal Wing", "tier": "D", "value": 30},
+    "hof": {"full": "Herrscher of Flamescion", "tier": "D", "value": 30},
+    "kujo's hat": {"full": "Kujo's Hat", "tier": "D", "value": 23},
+    "silver egg": {"full": "Silver Egg", "tier": "D", "value": 20},
 }
 
 # ============
