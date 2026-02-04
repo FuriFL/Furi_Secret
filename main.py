@@ -74,6 +74,18 @@ async def on_ready():
     print(f"Logged in as {client.user}")
 
 @client.event
+async def on_ready():
+    activity = discord.Activity(
+        type=discord.ActivityType.watching,
+        name="@Furi tierlist"
+    )
+
+    await client.change_presence(
+        status=discord.Status.online,
+        activity=activity
+    )
+    
+@client.event
 async def on_message(message):
     if message.author.bot:
         return
