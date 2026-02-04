@@ -481,4 +481,46 @@ async def on_message(message):
         try:
             await message.channel.send(file=discord.File("tierlist.png"))
         except Exception:
-            await message.channel.send("💔 Error 
+            await message.channel.send("💔 Error sending tierlist image.")
+        return
+
+    # If user asked for text tierlist (new)
+    if low in ["tierlist2", "tl2"]:
+        messages = build_tier_messages()
+        for m in messages:
+            await send_long_message(message.channel, m)
+        return
+
+    # New command format: expect "find <name>"
+    parts = raw.split(" ", 1)
+    if parts[0].lower() != "find":
+        await message.channel.send("😡 Please use `@Bot find <name>` to search for a spec/stand, `@Bot tl` for the tierlist image, `@Bot tl2` for text tierlist, or `@Bot my <items> for <items>` for W/F/L.")
+        return
+
+    if len(parts) < 2 or not parts[1].strip():
+        await message.channel.send("😡 Please provide a name after `find`. Example: `@Bot find ewu`")
+        return
+
+    query_raw = parts[1].strip()  # keep original casing for display
+    # search using normalized matching
+    key, data = find_entry_by_query(query_raw)
+
+    if key and data:
+        # display the user's typed short form as the prefix (title-cased), but prefer a nicer short name
+        display_name = query_raw
+        # if the matched key is different, prefer showing the key (which is the shorthand)
+        if key and key != normalize(query_raw):
+            # try to present the shorthand nicely
+            display_name = key.title()
+        # include amount if present
+        amount_text = f" x{data['amount']}" if data.get("amount") else ""
+        await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier!{amount_text}")
+    else:
+        await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
+
+
+# ============
+# run
+# ============
+client.run(os.getenv("TOKEN"))
+```0 
