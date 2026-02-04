@@ -90,7 +90,7 @@ TIERS = {
     "astolfots": {"full": "Astolfo | Taped Shut", "tier": "B", "value": 550},
     "cirno": {"full": "Hie Hie | The Strongest Fairy", "tier": "B", "value": 660},
     "eggwand": {"full": "Stop Sign | Egg Wand", "tier": "B", "value": 660},
-    "deku": {"full": "Deku", "tier": "B", "value": 750},
+    "deku": {"full": "Deku", "tier": "B", "value": 700},
     "frieren": {"full": "Frieren", "tier": "B", "value": 660},
     "stw devil": {"full": "Shadow The World | Devil", "tier": "B", "value": 610},
     "sandeh": {"full": "Sandevistan : Holiday 2077", "tier": "B", "value": 780},
