@@ -428,23 +428,15 @@ async def on_message(message):
     key, data = find_entry_by_query(query_raw)
 
     if key and data:
-    # display the user's typed short form as the prefix (title-cased), but prefer a nicer short name
-    display_name = query_raw
-    # if the matched key is different, prefer showing the key (which is the shorthand)
-    if key and key != normalize(query_raw):
-        # try to present the shorthand nicely
-        display_name = key.title()
-
-    # amount (if any) and value (if any)
-    amount_text = f" x{data['amount']}" if data.get("amount") else ""
-    value_text = data.get("value")
-    # show "N/A" if value is missing
-    if value_text is None:
-        value_text = "N/A"
-
-    # New reply format: "<display_name> is on <TIER> tier! (Value:<value>)"
-    reply = f"{display_name} is on {data['tier']} tier! (Value: {value_text}){amount_text}"
-    await message.channel.send(reply)
+        # display the user's typed short form as the prefix (title-cased), but prefer a nicer short name
+        display_name = query_raw
+        # if the matched key is different, prefer showing the key (which is the shorthand)
+        if key and key != normalize(query_raw):
+            # try to present the shorthand nicely
+            display_name = key.title()
+        # include amount if present
+        amount_text = f" x{data['amount']}" if data.get("amount") else ""
+        await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier!{amount_text}")
     else:
         await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
 
