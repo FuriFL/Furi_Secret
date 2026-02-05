@@ -134,7 +134,7 @@ TIERS = {
     "Sancho": {"full": "Sancho", "tier": "B", "Value": 400},
 
     #C
-    "fingers": {"full": "Sukuna's Cursed Finger", "tier": "C", "amount": 5, "value": 150},  
+    "5 fingers": {"full": "5 Sukuna's Cursed Fingers", "tier": "C", "value": 150},  
     "rusted sword": {"full": "Rusted Sword", "tier": "C", "value": 345},  
     "okarun egg": {"full": "Okarun | Egg of All-devouring Darkness", "tier": "C", "value": 400},  
     "getothm": {"full": "Suguru Geto | The Hunt Master", "tier": "C", "value": 365},  
