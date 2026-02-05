@@ -500,11 +500,12 @@ async def on_message(message):
             await send_long_message(message.channel, m)
         return
 
-    # ===== LIST SPECIFIC TIER =====
+# ===== LIST SPECIFIC TIER =====
     if raw.lower().startswith(("list ", "tl ", "tier ")):
     tier = raw.split(" ", 1)[1].upper()
 
     valid_tiers = ["U", "EX", "S", "A", "B", "C", "D", "SSR"]
+
     if tier not in valid_tiers:
         await message.channel.send(
             "❌ Unknown tier\nAvailable: U, EX, S, A, B, C, D"
@@ -521,7 +522,7 @@ async def on_message(message):
         await message.channel.send(f"⚠️ No specs found in **{tier}** tier")
         return
 
-    text = f"══════ **{tier} Tier** ══════\n\n" + "\n".join(lines)
+    text = f"===== **{tier} Tier** =====\n\n" + "\n".join(lines)
     await send_long_message(message.channel, text)
     return
 
