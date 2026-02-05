@@ -117,7 +117,7 @@ TIERS = {
     "kaiju no.8": {"full": "Kaiju No.8", "tier": "B", "value": 410},
     "sp shadow": {"full": "Star Platinum | Shadow Master", "tier": "B", "value": 410},
     "lunatic red eyes": {"full": "Emperor | Lunatic Red Eyes", "tier": "B", "value": 550},
-    "gojo1/2": {"full": "Gojo Satoru | 1/2", "tier": "B", "value": 610},
+    "gojo 1/2": {"full": "Gojo Satoru | 1/2", "tier": "B", "value": 610},
     "holy wreath": {"full": "Standless | Holy Wreath", "tier": "B", "value": 550},
     "st witch": {"full": "Summer Time | Witch", "tier": "B", "value": 475},
     "alucard": {"full": "Alucard", "tier": "B", "value": 600},
