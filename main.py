@@ -462,18 +462,18 @@ async def on_message(message):
     # ===== HELP COMMAND =====
     if raw.lower() in ["help", "commands", "cmd", "h"]:
         await message.channel.send(
-            "✨ **HELP | FuriBOT** ✨\n\n"
+            "🌸 **HELP | FuriBOT** 🌸\n\n"
             "════════════════════\n"
             "📜 **ALL COMMANDS**\n"
             "════════════════════\n\n"
-            "🔹 **@FuriBOT tierlist**\n"
+            "💮 **@FuriBOT tierlist**\n"
             "→ Show tierlist image\n\n"
-            "🔹 **@FuriBOT tierlist all**\n"
+            "💮 **@FuriBOT tierlist all**\n"
             "→ Show all specs with Tier & Value\n\n"
-            "🔹 **@FuriBOT find <name>**\n"
+            "💮 **@FuriBOT find <name>**\n"
             "→ Find spec Tier & Value\n"
             "Example: `@FuriBOT find vergil`\n\n"
-            "🔹 **@FuriBOT my <items> for <items>**\n"
+            "💮 **@FuriBOT my <items> for <items>**\n"
             "→ Check W / F / L by value\n"
             "Example: `@FuriBOT my ew+hie for kujo's hat+silver egg`\n\n"
             "════════════════════\n"
