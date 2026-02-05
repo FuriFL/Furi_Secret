@@ -166,7 +166,7 @@ TIERS = {
     "bag of presents": {"full": "Bag of Present", "tier": "C", "amount": 5, "value": 140},  
     "ger": {"full": "Gold Experience Requiem", "tier": "C", "value": 60},  
     "padoru": {"full": "Padoru", "tier": "C", "value": 73},  
-    "headhunter": {"full": "Emperor | Headhunter", "tier": "C", "value": 53},  
+    "emperor headhunter": {"full": "Emperor | Headhunter", "tier": "C", "value": 53},  
     "stop sign bisento": {"full": "Stop Sign | Bisento", "tier": "C", "value": 45},  
     
     #D
