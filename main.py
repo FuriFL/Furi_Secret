@@ -438,7 +438,7 @@ async def on_message(message):
             display_name = key.title()
         # include amount if present
         amount_text = f" x{data['amount']}" if data.get("amount") else ""
-        await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier! | Value Point: **{data['value']}**")
+        await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier! | Value: **{data['value']}**")
     else:
         await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
         
