@@ -365,6 +365,68 @@ def wfl_command(raw_text: str):
 
     return "\n".join(out_lines)
 
+# --- เพิ่ม helper สำหรับสร้าง list ของทุกเทียร์/ตัวละคร ---
+def build_full_tier_messages():
+    """
+    คืนค่า list ของข้อความ (แต่ละรายการเป็นข้อความสำหรับส่ง)
+    แบ่งตาม Tier (preferred order). ข้อความแต่ละชิ้นจะไม่เกิน 1900 ถ้าเป็นไปได้
+    """
+    preferred_order = ["U", "EX", "S", "A", "B", "C", "D", "SSR", "UNKNOWN"]
+    groups = {}
+    for key, data in TIERS.items():
+        tier = data.get("tier", "UNKNOWN")
+        full = data.get("full", key)
+        amount = data.get("amount")
+        value = data.get("value", "N/A")
+        # รูปแบบที่จะแสดง: Full — Tier: X — Value: Y (xN ถ้ามี amount) (key: shorthand)
+        extra_amount = f" x{amount}" if amount else ""
+        display = f"{full} — Tier: {tier} — Value: {value}{extra_amount}  (key: {key})"
+        groups.setdefault(tier, []).append(display)
+
+    messages = []
+    # สร้างข้อความตาม preferred order
+    for t in preferred_order:
+        items = groups.get(t, [])
+        if not items:
+            continue
+        header = f"======== {t} Tier ========\n"
+        body = "\n".join(items)
+        messages.append(header + body)
+
+    # ถ้ามี tier อื่น ๆ ที่ไม่ได้อยู่ใน preferred_order
+    for t, items in groups.items():
+        if t in preferred_order:
+            continue
+        header = f"======== {t} Tier ========\n"
+        body = "\n".join(items)
+        messages.append(header + body)
+
+    return messages
+
+
+# --- helper สำหรับส่งข้อความยาวเป็นชิ้น ๆ ---
+async def send_long_message(channel, text):
+    """
+    ส่งข้อความโดยแยกเป็นชิ้น ถ้ายาวเกิน 1900 ตัวอักษร (ปลอดภัยกับ Discord)
+    """
+    if len(text) <= 1900:
+        await channel.send(text)
+        return
+
+    lines = text.split("\n")
+    chunk = []
+    size = 0
+    for ln in lines:
+        ln_with_n = ln + "\n"
+        if size + len(ln_with_n) > 1900 and chunk:
+            await channel.send("".join(chunk))
+            chunk = []
+            size = 0
+        chunk.append(ln_with_n)
+        size += len(ln_with_n)
+    if chunk:
+        await channel.send("".join(chunk))
+
 
 # ============
 # events
@@ -404,6 +466,13 @@ async def on_message(message):
     if raw.lower().startswith("my "):
         reply = wfl_command(raw)
         await message.channel.send(reply)
+        return
+
+    # ถ้า user พิมพ์ขอ list ทุกตัวพร้อม value
+    if raw.lower() in ["tierlist all", "tl all", "tierlist all", "list all", "list all tiers"]:
+        messages = build_full_tier_messages()
+        for m in messages:
+            await send_long_message(message.channel, m)
         return
 
     # If user asked for tierlist (backwards compatible)
