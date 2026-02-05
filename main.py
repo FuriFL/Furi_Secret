@@ -441,7 +441,25 @@ async def on_message(message):
         await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier! | Value: **{data['value']}**")
     else:
         await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
+       
+    if raw.lower() in ["h", "help"]:
+        try:
+            await message.channel.send(
+    """===== ALL COMMAND FOR NOW =====
 
+@FuriBOT tierlist
+
+@FuriBOT find <name>
+
+@FuriBOT my <items> for <items>
+
+Note: Value of specs **aren't** official.
+Don't fully believe them • we still need better balancing
+"""
+            )
+        except Exception:
+            await message.channel.send("💔 Error sending tierlist image.")
+        return
 
 # ============
 # run
