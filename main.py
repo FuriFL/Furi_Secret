@@ -35,7 +35,7 @@ TIERS = {
     "soc": {"full": "Soul of Cinder", "tier": "A", "value": 3250},
     "nerd": {"full": "Standless | Nerd", "tier": "A", "value": 1700},
     "coco": {"full": "Rainy Time | Coco", "tier": "A", "value": 1700, "allias":["rainy time coco"]},
-    "tuna": {"full": "Anubis Requiem | Tuna", "tier": "A", "value": 2000},
+    "tuna": {"full": "Anubis Requiem | Tuna", "tier": "A", "value": 3500},
     "ewu": {"full": "Eternal Wing | Unleashed", "tier": "A", "value": 1630, "allias": ["ew:u", "ew u"]},
     "5th sinner": {"full": "Lei Heng | The 5th Sinner", "tier": "A", "value": 1570},
     "fx!chara": {"full": "X!Chara : Frostbite", "tier": "A", "value": 1300, "allias": ["fxchara", "x!chara frostbite", "xcharaf", "x!charaf", "x!chara f", "xchara f"]},
