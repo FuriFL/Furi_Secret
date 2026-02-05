@@ -85,7 +85,7 @@ TIERS = {
     "easter egg": {"full": "Easter Egg", "tier": "B", "value": 500},
     "sibuna": {"full": "Anubis | Sibuna", "tier": "B", "value": 760},
     "bunny suit": {"full": "Summer Time | Bunny Suit", "tier": "B", "value": 760},
-    "ar": {"full": "Anubis Requiem", "tier": "B", "value": 800},
+    "ar": {"full": "Anubis Requiem", "tier": "B", "value": 400},
     "astolfosp": {"full": "Astolfo | Sailor Paladin", "tier": "B", "value": 650},
     "astolfo": {"full": "Astolfo (Saber)", "tier": "B", "value": 600},
     "astolfots": {"full": "Astolfo | Taped Shut", "tier": "B", "value": 550},
