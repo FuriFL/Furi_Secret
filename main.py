@@ -197,46 +197,70 @@ TIERS = {
 # helpers
 # ============
 def normalize(s: str) -> str:
-    """lower, strip spaces, collapse spaces, remove surrounding punctuation"""
-    if s is None:
+    """Lowercase, trim spaces, collapse spaces, remove surrounding punctuation"""
+    if not s:
         return ""
     s = s.strip().lower()
     s = re.sub(r"\s+", " ", s)
-    # remove leading/trailing punctuation
-    s = s.strip(" '\"`.,:;-()[]{}")
-    return s
+    return s.strip(" '\"`.,:;-()[]{}")
 
 
 def find_entry_by_query(q: str):
     """
-    Try to find an entry in TIERS by:
-    - exact key match
-    - full name match
-    - normalized match (ignore case & extra spaces & surrounding punctuation)
-    - partial containment match
-    Returns tuple (key, data) or (None, None)
+    Find an entry in TIERS by:
+    1) exact key
+    2) normalized key / full / alias
+    3) partial match (key / full / alias)
+
+    Returns (key, data) or (None, None)
     """
     q_norm = normalize(q)
 
-    # 1) direct key match (exact)
+    # ---------- 1) exact key ----------
     if q_norm in TIERS:
         return q_norm, TIERS[q_norm]
 
-    # 2) try match full names or keys with normalization
+    # ---------- 2) normalized exact ----------
     for key, data in TIERS.items():
-        # check normalized key
-        if normalize(key) == q_norm:
+        key_norm = normalize(key)
+
+        if key_norm == q_norm:
             return key, data
-        # check normalized full name
-        if normalize(data.get("full", "allias")) == q_norm:
+
+        full_norm = normalize(data.get("full", ""))
+        if full_norm == q_norm:
             return key, data
+
+        for alias in data.get("alias", []):
+            if normalize(alias) == q_norm:
+                return key, data
+
+    # ---------- 3) partial match ----------
+    for key, data in TIERS.items():
+        key_norm = normalize(key)
+        full_norm = normalize(data.get("full", ""))
+
+        if q_norm in key_norm or key_norm in q_norm:
+            return key, data
+
+        if q_norm in full_norm or full_norm in q_norm:
+            return key, data
+
+        for alias in data.get("alias", []):
+            alias_norm = normalize(alias)
+            if q_norm in alias_norm or alias_norm in q_norm:
+                return key, data
+
+    return None, None
+
 
     # 3) partial containment (if user typed a smaller phrase)
     # e.g., user types "vergil" and full is "True Anubis | Vergil" -> match
     for key, data in TIERS.items():
-        full_norm = normalize(data.get("full", "allias"))
+        full_norm = normalize(data.get("full", ""))
         if q_norm in full_norm or full_norm in q_norm:
             return key, data
+
 
     return None, None
 
