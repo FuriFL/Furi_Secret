@@ -556,7 +556,7 @@ async def on_message(message):
             if t == tier:
                 value = data.get("value", 0)
                 lines.append(f"• {data.get('full','')} | value: {value} 
-                (#key: {key})")
+                #key: {key})")
 
         if not lines:
             await message.channel.send(f"⚠️ No specs found in **{tier}** tier")
