@@ -11,9 +11,8 @@ client = discord.Client(intents=intents)
 TOLERANCE = 0.10
 
 # ======================
-# TIERS DATA (รวม U, EX, S, A, B, C, D) — อย่าให้ตัวละครหายแม้แต่ตัวเดียว
-# KEY: lower-case shorthand หรือคำที่คุณอยากพิมพ์หา
-# value: dict { "full": ชื่อเต็ม, "tier": ระดับ, optional "amount": จำนวน, optional "value": numeric }
+# TIERS DATA ...
+# (ใช้ของคุณได้เลย — ผมไม่เปลี่ยนส่วนนี้ ยกเว้นตัวอย่าง alias ที่คุณใส่ไว้)
 # ======================
 TIERS = {
     # ===== U =====
@@ -196,6 +195,7 @@ TIERS = {
 # ============
 # helpers
 # ============
+
 def normalize(s: str) -> str:
     """Lowercase, trim spaces, collapse spaces, remove surrounding punctuation"""
     if not s:
@@ -203,6 +203,19 @@ def normalize(s: str) -> str:
     s = s.strip().lower()
     s = re.sub(r"\s+", " ", s)
     return s.strip(" '\"`.,:;-()[]{}")
+
+
+def _get_alias_list(data):
+    """Return list of aliases from a tier entry (supports many spellings)."""
+    for k in ("alias", "aliases", "allias", "alliases"):
+        v = data.get(k)
+        if not v:
+            continue
+        if isinstance(v, str):
+            return [v]
+        if isinstance(v, (list, tuple)):
+            return list(v)
+    return []
 
 
 def find_entry_by_query(q: str):
@@ -221,39 +234,22 @@ def find_entry_by_query(q: str):
     if q_norm in TIERS:
         return q_norm, TIERS[q_norm]
 
-    # helper to get aliases list from an entry (tolerant to different keys)
-    def get_alias_list(data):
-        for k in ("alias", "aliases", "allias", "alliases"):
-            v = data.get(k)
-            if not v:
-                continue
-            # if single string, wrap in list
-            if isinstance(v, str):
-                return [v]
-            if isinstance(v, (list, tuple)):
-                return list(v)
-        return []
-
-    # 2) try match full names, normalized keys and aliases (exact)
+    # 2) try match normalized keys, full names, aliases (exact)
     for key, data in TIERS.items():
-        # normalized shorthand key
         if normalize(key) == q_norm:
             return key, data
-        # normalized full name
         if normalize(data.get("full", "")) == q_norm:
             return key, data
-        # aliases exact match
-        for a in get_alias_list(data):
+        for a in _get_alias_list(data):
             if normalize(a) == q_norm:
                 return key, data
 
-    # 3) token-overlap scoring fallback
+    # 3) token-overlap scoring fallback (helps when user puts spaces or partial words)
     best = None
     best_score = 0
-    best_fraction = 0.0  # tie-breaker: fraction of name covered
+    best_fraction = 0.0
     for key, data in TIERS.items():
-        # collect candidate names to compare: full + key + aliases
-        candidates = [data.get("full", ""), key] + get_alias_list(data)
+        candidates = [data.get("full", ""), key] + _get_alias_list(data)
         for name in candidates:
             name_norm = normalize(name)
             if not name_norm:
@@ -261,16 +257,11 @@ def find_entry_by_query(q: str):
             name_tokens = set(name_norm.split())
             if not name_tokens:
                 continue
-
-            # compute intersection
             inter = q_tokens & name_tokens
             score = len(inter)
             if score == 0:
                 continue
-
-            fraction = score / len(name_tokens)  # how much of candidate matched
-
-            # choose better by (score, fraction)
+            fraction = score / len(name_tokens)
             if (score > best_score) or (score == best_score and fraction > best_fraction):
                 best = (key, data)
                 best_score = score
@@ -279,46 +270,45 @@ def find_entry_by_query(q: str):
     if best:
         return best[0], best[1]
 
-    return None, None
-
-
-    # 3) partial containment (if user typed a smaller phrase)
-    # e.g., user types "vergil" and full is "True Anubis | Vergil" -> match
+    # 4) last-resort partial containment (like "vergil" in "True Anubis | Vergil")
     for key, data in TIERS.items():
         full_norm = normalize(data.get("full", ""))
         if q_norm in full_norm or full_norm in q_norm:
             return key, data
 
-
     return None, None
+
+
+def get_toplist_by_tier(tier: str):
+    """Return list of entries in given tier sorted by value desc"""
+    t_norm = tier.strip().upper()
+    items = []
+    for key, data in TIERS.items():
+        t = data.get("tier", data.get("SPECIAL", "")).upper()
+        if t == t_norm:
+            items.append({
+                "key": key,
+                "full": data.get("full", key),
+                "value": data.get("value", 0)
+            })
+    items.sort(key=lambda x: (x["value"] if x["value"] is not None else 0), reverse=True)
+    return items
 
 
 # ============
 # value / calc helpers (ใช้ TIERS เป็นแหล่งข้อมูล)
 # ============
 def parse_multiplier_and_key(raw_item: str):
-    """
-    รองรับรูปแบบเช่น:
-      - "fingers x5"  or "fingers×5" or "fingers x 5"
-      - "5x fingers" (รองรับได้ในอนาคต ถ้าต้องการ ปัจจุบันจะจับแบบหลังไม่บังคับ)
-    คืนค่า (normalized_key, multiplier, original_key_string)
-    """
     item = raw_item.strip()
-    # pattern: name [x|×] number (ท้าย)
     m = re.search(r"^(.*?)[\s]*[x×]\s*(\d+)\s*$", item, flags=re.IGNORECASE)
     if m:
         name = m.group(1).strip()
         count = int(m.group(2))
         return normalize(name), count, name
-    # no explicit multiplier
     return normalize(item), 1, item
 
 
 def calc_value(item_list):
-    """
-    คืนค่า (total_value:int, unknown_items:list[str], details:list[str])
-    details เป็นรายการ "Full name (+value x count = total)" เพื่อแสดงในผลลัพธ์
-    """
     total = 0
     unknown = []
     details = []
@@ -329,21 +319,17 @@ def calc_value(item_list):
         key_norm, mult, original = parse_multiplier_and_key(raw)
         key, data = find_entry_by_query(key_norm)
         if not data:
-            # ยังไม่รู้ชื่อนี้
             unknown.append(original)
             continue
 
-        base_value = data.get("value", 0)
-        # ถ้าระบุ amount ใน object (เช่น fingers มี amount=5) ให้คูณด้วย amount ถ้ามีความหมาย
+        base_value = data.get("value", 0) or 0
         amount_defined = data.get("amount")
         if amount_defined and mult == 1:
-            # ถ้าผู้ใช้ไม่ได้บอก multiplier แต่มี field amount: ให้ใช้ amount เป็น multiplier
             mult = amount_defined
 
         item_total = base_value * mult
         total += item_total
 
-        # details แสดงชัดเจน
         if mult != 1:
             details.append(f"{data['full']} x{mult} (+{base_value} each → +{item_total})")
         else:
@@ -353,16 +339,12 @@ def calc_value(item_list):
 
 
 def wfl_command(raw_text: str):
-    """
-    raw_text ควรเป็นumiem... (เหมือนเดิม)
-    """
     text = raw_text.strip()
     low = text.lower()
 
     if "my " not in low or " for " not in low:
         return "❌ Format: `my item1+item2 for itemA+itemB`"
 
-    # แยกส่วนอย่างปลอดภัย
     try:
         start_my = low.index("my ")
         start_for = low.rindex(" for ")
@@ -413,7 +395,7 @@ def wfl_command(raw_text: str):
     return "\n".join(out_lines)
 
 
-# --- เพิ่ม helper สำหรับสร้าง list ของทุกเทียร์/ตัวละคร ---
+# --- helper สำหรับสร้าง list ของทุกเทียร์/ตัวละคร ---
 def build_full_tier_messages():
     preferred_order = ["U", "EX", "S", "A", "B", "C", "D", "SSR", "SPECIAL", "UNKNOWN"]
     groups = {}
@@ -509,7 +491,9 @@ async def on_message(message):
             "💮 **@FuriBOT tierlist all**\n"
             "→ Show all specs with Tier & Value\n\n"
             "💮 **@FuriBOT list <tier>**\n"
-            "→ Show all specs in a specific tier\n\n"
+            "→ Show all specs in a specific tier (sorted by value desc)\n\n"
+            "💮 **@FuriBOT toplist <tier> [N]**\n"
+            "→ Show top N specs in that tier (default N=10). Example: `@FuriBOT toplist A 5`\n\n"
             "💮 **@FuriBOT find <name>**\n"
             "→ Find spec Tier & Value\n"
             "Example: `@FuriBOT find vst`\n\n"
@@ -540,8 +524,29 @@ async def on_message(message):
             await send_long_message(message.channel, m)
         return
 
+    # ===== TOPLIST =====
+    # usage: "@FuriBOT toplist A" or "@FuriBOT toplist A 5"
+    if raw.lower().startswith("toplist "):
+        parts = raw.split()
+        if len(parts) < 2:
+            await message.channel.send("❌ Usage: `@FuriBOT toplist <tier> [N]`")
+            return
+        tier = parts[1].upper()
+        n = 10
+        if len(parts) >= 3 and parts[2].isdigit():
+            n = max(1, int(parts[2]))
+        items = get_toplist_by_tier(tier)
+        if not items:
+            await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
+            return
+        lines = []
+        for i, it in enumerate(items[:n], start=1):
+            lines.append(f"{i}. **{it['full']}** (key: {it['key']}) | Value: {it['value']}")
+        await send_long_message(message.channel, f"🏆 **TOPLIST | Tier {tier}**\n\n" + "\n".join(lines))
+        return
+
     # ===== LIST SPECIFIC TIER =====
-    # รูปแบบ: "list A" หรือ "tier A" (case-insensitive)
+    # รูปแบบ: "list A" หรือ "tier A" (case-insensitive) — sorted by value desc
     parts = raw.split()
     if len(parts) == 2 and parts[0].lower() in ["list", "tier"]:
         tier = parts[1].upper()
@@ -550,17 +555,19 @@ async def on_message(message):
             await message.channel.send("❌ Unknown tier\nAvailable: U, EX, S, A, B, C, D, SSR")
             return
 
-        lines = []
+        entries = []
         for key, data in TIERS.items():
-            t = data.get("tier", data.get("SPECIAL"))
+            t = data.get("tier", data.get("SPECIAL", "")).upper()
             if t == tier:
-                value = data.get("value", 0)
-                lines.append(f"• {data.get('full','')} | value: {value} | #key: {key})")
+                entries.append((key, data.get("full", key), data.get("value", 0)))
+        # sort by value desc
+        entries.sort(key=lambda x: (x[2] if x[2] is not None else 0), reverse=True)
 
-        if not lines:
+        if not entries:
             await message.channel.send(f"⚠️ No specs found in **{tier}** tier")
             return
 
+        lines = [f"• **{full}** | value: {value} | key: {key}" for key, full, value in entries]
         text = f"===== {tier} Tier =====\n\n" + "\n".join(lines)
         await send_long_message(message.channel, text)
         return
@@ -585,15 +592,15 @@ async def on_message(message):
         return
 
     query_raw = parts[1].strip()  # keep original casing for display
-    # search using normalized matching
     key, data = find_entry_by_query(query_raw)
 
     if key and data:
-        display_name = query_raw
-        if key and key != normalize(query_raw):
-            display_name = key.title()
+        # show full name (proper casing) and include key as shorthand
+        full_name = data.get("full", key)
+        tier_val = data.get("tier", data.get("SPECIAL", "UNKNOWN"))
         amount_text = f" x{data['amount']}" if data.get("amount") else ""
-        await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data.get('tier', data.get('SPECIAL','UNKNOWN'))}** Tier! | Value: **{data.get('value','N/A')}**{amount_text}")
+        value_text = data.get("value", "N/A")
+        await message.channel.send(f"**{full_name}** (key: {key}) is on **{tier_val}** Tier! | Value: **{value_text}**{amount_text}")
     else:
         await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
 
