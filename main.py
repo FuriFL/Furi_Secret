@@ -39,7 +39,7 @@ TIERS = {
     "tuna": {"full": "Anubis Requiem | Tuna", "tier": "A", "value": 2000},
     "ewu": {"full": "Eternal Wing | Unleashed", "tier": "A", "value": 1630, "allias": ["ew:u", "ew u"]},
     "5th sinner": {"full": "Lei Heng | The 5th Sinner", "tier": "A", "value": 1570},
-    "fx!chara": {"full": "X!Chara : Frostbite", "tier": "A", "value": 1300, "allias": ["fxchara", "volts", "taped shut"]},
+    "fx!chara": {"full": "X!Chara : Frostbite", "tier": "A", "value": 1300, "allias": ["fxchara", "x!chara frostbite", "xcharaf", "x!charaf", "x!chara f", "xchara f"]},
     "duf": {"full": "Dullahan | Unyielding Frost", "tier": "A", "value": 1135},
     "se": {"full": "Singularity Essence", "tier": "A", "value": 1300},
     "mkb": {"full": "Midknight", "tier": "A", "value": 1135},
