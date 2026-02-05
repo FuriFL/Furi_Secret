@@ -524,40 +524,42 @@ async def on_message(message):
             await send_long_message(message.channel, m)
         return
 
-# ===== TOPLIST =====
-# usage: "@FuriBOT toplist A" or "@FuriBOT toplist A 5"
-if raw.lower().startswith("toplist "):
-    parts = raw.split()
-
-    if len(parts) < 2:
-        await message.channel.send("❌ Usage: `@FuriBOT toplist <tier> [N]`")
+# ===== TIERLIST ALL =====
+    if raw.lower() in ["tierlist all", "tl all", "list all", "list all tiers"]:
+        messages = build_full_tier_messages()
+        for m in messages:
+            await send_long_message(message.channel, m)
         return
 
-    tier = parts[1].upper()
+    # ===== TOPLIST =====
+    if raw.lower().startswith("toplist"):
+        parts = raw.split()
 
-    items = get_toplist_by_tier(tier)
-    if not items:
-        await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
-        return
+        if len(parts) < 2:
+            await message.channel.send("❌ Usage: `@FuriBOT toplist <tier> [N]`")
+            return
 
-    # default: show ALL
-    n = len(items)
+        tier = parts[1].upper()
+        items = get_toplist_by_tier(tier)
 
-    # if user specifies N
-    if len(parts) >= 3 and parts[2].isdigit():
-        n = max(1, int(parts[2]))
+        if not items:
+            await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
+            return
 
-    lines = []
-    for i, it in enumerate(items[:n], start=1):
-        lines.append(
+        n = len(items)
+        if len(parts) >= 3 and parts[2].isdigit():
+            n = max(1, int(parts[2]))
+
+        lines = [
             f"{i}. **{it['full']}** (key: {it['key']}) | Value: {it['value']}"
-        )
+            for i, it in enumerate(items[:n], start=1)
+        ]
 
-    await send_long_message(
-        message.channel,
-        f"💮 **TOPLIST | Tier {tier}**💮\n\n" + "\n".join(lines)
-    )
-    return
+        await send_long_message(
+            message.channel,
+            f"💮 **TOPLIST | Tier {tier}** 💮\n\n" + "\n".join(lines)
+        )
+        return
 
     # ===== LIST SPECIFIC TIER =====
     # รูปแบบ: "list A" หรือ "tier A" (case-insensitive) — sorted by value desc
