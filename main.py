@@ -415,23 +415,6 @@ async def on_message(message):
             await message.channel.send("💔 Error sending tierlist image.")
         return
 
-    if raw.lower() in ["help", "h"]:
-        try:
-            await message.channel.send(
-            """===== ALL COMMAND FOR NOW =====
-
-@FuriBOT tierlist
-
-@FuriBOT find <name>
-
-@FuriBOT my <items> for <items>
-
-Note: Spec values are NOT official.
-Use them as a reference only — further balancing is needed.
-"""
-            )
-            return
-
     # New command format: expect "find <name>"
     parts = raw.split(" ", 1)
     if parts[0].lower() != "find":
