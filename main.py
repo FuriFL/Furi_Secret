@@ -441,17 +441,16 @@ async def on_message(message):
         await message.channel.send(f"**{display_name}** **[{data['full']}]** is on **{data['tier']}** Tier! | Value: **{data['value']}**")
     else:
         await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
-       
-    @client.event
-async def on_message(message):
-    if message.author.bot:
-        return
-
-    content = message.content.lower().strip()
+        
+        @client.event
+        async def on_message(message):
+            if message.author.bot:
+                return
+                content = message.content.lower().strip()
 
     # ตรวจจับ help
-    if content in ["@furibot help", "help", "furi help"]:
-        await message.channel.send(
+        if content in ["@furibot help", "help", "furi help"]:
+            await message.channel.send(
             """===== ALL COMMAND FOR NOW =====
 
 @FuriBOT tierlist
