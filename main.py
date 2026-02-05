@@ -442,10 +442,17 @@ async def on_message(message):
     else:
         await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
        
-    if raw.lower() in ["h", "help"]:
-        try:
-            await message.channel.send(
-    """===== ALL COMMAND FOR NOW =====
+    @client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    content = message.content.lower().strip()
+
+    # ตรวจจับ help
+    if content in ["@furibot help", "help", "furi help"]:
+        await message.channel.send(
+            """===== ALL COMMAND FOR NOW =====
 
 @FuriBOT tierlist
 
@@ -453,13 +460,10 @@ async def on_message(message):
 
 @FuriBOT my <items> for <items>
 
-Note: Value of specs **aren't** official.
-Don't fully believe them • we still need better balancing
+Note: Spec values are NOT official.
+Use them as a reference only — further balancing is needed.
 """
-            )
-        except Exception:
-            await message.channel.send("💔 Error sending tierlist image.")
-        return
+        )
 
 # ============
 # run
