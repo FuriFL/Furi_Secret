@@ -415,7 +415,7 @@ async def on_message(message):
             await message.channel.send("💔 Error sending tierlist image.")
         return
 
-    if raw.lower() in ["tierlist", "tl"]:
+    if raw.lower() in ["help", "h"]:
         try:
             await message.channel.send(
             """===== ALL COMMAND FOR NOW =====
