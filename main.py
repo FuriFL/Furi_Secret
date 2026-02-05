@@ -45,11 +45,11 @@ TIERS = {
     "mkb": {"full": "Midknight", "tier": "A", "value": 1135, "allias": ["mk", "seele"]},
     "hx!chara": {"full": "X!Chara | Hallowed", "tier": "A", "value": 1000, "allias": ["hxchara", "x!chara hallowed", "xchara hallowed"]},
     "dull": {"full": "Remembrance of Dullahan", "tier": "A", "value": 945},
-    "x!chara": {"full": "X!Chara", "tier": "A", "value": 920},
+    "x!chara": {"full": "X!Chara", "tier": "A", "value": 920, "allias": ["xchara", "x chara"]},
     "agnes": {"full": "Okarun | Agnes Tachyon", "tier": "A", "value": 870},
-    "rukia ws": {"full": "Rukia Kuchiki : Winter Season", "tier": "A", "value": 870},
+    "rukia ws": {"full": "Rukia Kuchiki : Winter Season", "tier": "A", "value": 870, "allias": ["rukiaws"]},
     "rukia": {"full": "Rukia Kuchiki", "tier": "A", "value": 835},
-    "goldship requiem": {"full": "Gold Ship Experience Requiem", "tier": "A", "value": 845},
+    "goldship requiem": {"full": "Gold Ship Experience Requiem", "tier": "A", "value": 845, "allias": ["gold ship req", "goldship req"]},
     "goldship experience": {"full": "Goldship Experience", "tier": "A", "value": 835},
     "spin ce": {"full": "Spin | Singularity Essence", "tier": "A", "value": 960},
     "aizen evo": {"full": "Aizen Sosuke (Hogyoku Fusion)", "tier": "A", "value": 835},
@@ -555,7 +555,7 @@ async def on_message(message):
             t = data.get("tier", data.get("SPECIAL"))
             if t == tier:
                 value = data.get("value", 0)
-                lines.append(f"• {data.get('full','')} | value: {value}")
+                lines.append(f"• {data.get('full','')} | value: {value} #key: {data.get('key','')")
 
         if not lines:
             await message.channel.send(f"⚠️ No specs found in **{tier}** tier")
