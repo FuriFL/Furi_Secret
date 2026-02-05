@@ -57,7 +57,7 @@ TIERS = {
     "ronin ce": {"full": "Ronin | Crimson Eclipse", "tier": "A", "value": 835},
     "ronin awk": {"full": "Ronin (Successor of Niten Ichiryu)", "tier": "A", "value": 850},
     "pk": {"full": "Pilgrim Knight", "tier": "A", "value": 780},
-    "starrk": {"full": "Coyote Starrk", "tier": "A", "value": 740},
+    "starrk": {"full": "Coyote Starrk", "tier": "A", "value": 750},
     "satono": {"full": "Satono Crazy Diamond", "tier": "A", "value": 750},
     "kamen rider": {"full": "Black Silence | Kamen Rider Gaim", "tier": "A", "value": 750},
     "will of fate": {"full": "Will of Fate", "tier": "A", "value": 1300},
