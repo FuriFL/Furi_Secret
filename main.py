@@ -532,7 +532,7 @@ async def on_message(message):
             await message.channel.send("❌ Usage: `@FuriBOT toplist <tier> [N]`")
             return
         tier = parts[1].upper()
-        n = 10
+        n = len(items)  
         if len(parts) >= 3 and parts[2].isdigit():
             n = max(1, int(parts[2]))
         items = get_toplist_by_tier(tier)
