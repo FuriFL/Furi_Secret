@@ -524,26 +524,40 @@ async def on_message(message):
             await send_long_message(message.channel, m)
         return
 
-    # ===== TOPLIST =====
-    # usage: "@FuriBOT toplist A" or "@FuriBOT toplist A 5"
-    if raw.lower().startswith("toplist "):
-        parts = raw.split()
-        if len(parts) < 2:
-            await message.channel.send("❌ Usage: `@FuriBOT toplist <tier> [N]`")
-            return
-        tier = parts[1].upper()
-        n = len(parts)  
-        if len(parts) >= 3 and parts[2].isdigit():
-            n = max(1, int(parts[2]))
-        items = get_toplist_by_tier(tier)
-        if not items:
-            await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
-            return
-        lines = []
-        for i, it in enumerate(items[:n], start=1):
-            lines.append(f"{i}. **{it['full']}** (key: {it['key']}) | Value: {it['value']}")
-        await send_long_message(message.channel, f"🏆 **TOPLIST | Tier {tier}**\n\n" + "\n".join(lines))
+# ===== TOPLIST =====
+# usage: "@FuriBOT toplist A" or "@FuriBOT toplist A 5"
+if raw.lower().startswith("toplist "):
+    parts = raw.split()
+
+    if len(parts) < 2:
+        await message.channel.send("❌ Usage: `@FuriBOT toplist <tier> [N]`")
         return
+
+    tier = parts[1].upper()
+
+    items = get_toplist_by_tier(tier)
+    if not items:
+        await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
+        return
+
+    # default: show ALL
+    n = len(items)
+
+    # if user specifies N
+    if len(parts) >= 3 and parts[2].isdigit():
+        n = max(1, int(parts[2]))
+
+    lines = []
+    for i, it in enumerate(items[:n], start=1):
+        lines.append(
+            f"{i}. **{it['full']}** (key: {it['key']}) | Value: {it['value']}"
+        )
+
+    await send_long_message(
+        message.channel,
+        f"💮 **TOPLIST | Tier {tier}**💮\n\n" + "\n".join(lines)
+    )
+    return
 
     # ===== LIST SPECIFIC TIER =====
     # รูปแบบ: "list A" หรือ "tier A" (case-insensitive) — sorted by value desc
