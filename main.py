@@ -23,21 +23,21 @@ TIERS = {
     "solemn": {"full": "Cross | Butterflies' Funeral", "tier": "EX", "value": 20000},
 
     # ===== S =====
-    "cross": {"full": "Cross", "tier": "S", "value": 10000},
+    "cross": {"full": "Cross", "tier": "S", "value": 10000, "allias": ["xsans", "cross sans", "crosssans"]}
     "uf": {"full": "Undying Flame", "tier": "S", "value": 7300},
     "vst": {"full": "Valentine Summer Time", "tier": "S", "value": 7000},
-    "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S", "value": 6520},
-    "mkvol": {"full": "Midknight Vessel of Life", "tier": "S", "value": 4500},
-    "mkvolts": {"full": "Midknight Vessel of Life | Taped Shut", "tier": "S", "value": 4000},
+    "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S", "value": 6520, "allias": ["ew:u rgb", "ewurgb", ew u rgb]},
+    "mkvol": {"full": "Midknight Vessel of Life", "tier": "S", "value": 4500, "allias": ["mk vol", "vol"]},
+    "mkvolts": {"full": "Midknight Vessel of Life | Taped Shut", "tier": "S", "value": 4000, "allias": ["mk volts"], ["volts"], ["taped shut"]},
     "mimivol": {"full": "Midknight Vessel of Life | Mimicry", "tier": "S", "value": 3500},
 
     # ===== A =====
-    "wh": {"full": "Wild Hunt", "tier": "A", "value": 3500},
+    "wh": {"full": "Wild Hunt", "tier": "A", "value": 3500, "allias": ["wildhunt"]},
     "soc": {"full": "Soul of Cinder", "tier": "A", "value": 3250},
     "nerd": {"full": "Standless | Nerd", "tier": "A", "value": 1700},
-    "coco": {"full": "Rainy Time | Coco", "tier": "A", "value": 1700},
+    "coco": {"full": "Rainy Time | Coco", "tier": "A", "value": 1700, "allias":["rainy time coco"]},
     "tuna": {"full": "Anubis Requiem | Tuna", "tier": "A", "value": 2000},
-    "ewu": {"full": "Eternal Wing | Unleashed", "tier": "A", "value": 1630},
+    "ewu": {"full": "Eternal Wing | Unleashed", "tier": "A", "value": 1630, "allias": ["ew:u", "ew u"]},
     "5th sinner": {"full": "Lei Heng | The 5th Sinner", "tier": "A", "value": 1570},
     "fx!chara": {"full": "X!Chara : Frostbite", "tier": "A", "value": 1300},
     "duf": {"full": "Dullahan | Unyielding Frost", "tier": "A", "value": 1135},
@@ -228,13 +228,13 @@ def find_entry_by_query(q: str):
         if normalize(key) == q_norm:
             return key, data
         # check normalized full name
-        if normalize(data.get("full", "")) == q_norm:
+        if normalize(data.get("full", "allias")) == q_norm:
             return key, data
 
     # 3) partial containment (if user typed a smaller phrase)
     # e.g., user types "vergil" and full is "True Anubis | Vergil" -> match
     for key, data in TIERS.items():
-        full_norm = normalize(data.get("full", ""))
+        full_norm = normalize(data.get("full", "allias"))
         if q_norm in full_norm or full_norm in q_norm:
             return key, data
 
