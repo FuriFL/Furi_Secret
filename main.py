@@ -442,34 +442,6 @@ async def on_message(message):
     else:
         await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
 
-@bot.event
-async def on_message(message):
-    if message.author.bot:
-        return
-
-    content = message.content.strip().lower()
-
-    # ===== HELP COMMAND =====
-    if content in ["@furibot help", "@bot help"]:
-        embed = discord.Embed(
-            title="FuriBOT Commands",
-            description="This is all command for now",
-            color=0x9b59b6
-        )
-
-        embed.add_field(name="Tier List", value="@FuriBOT tierlist", inline=False)
-        embed.add_field(name="Find", value="@FuriBOT find <name>", inline=False)
-        embed.add_field(
-            name="Trade",
-            value="@FuriBOT my <items> for <items>",
-            inline=False
-        )
-
-        await message.channel.send(embed=embed)
-        return
-    # =========================
-
-    await bot.process_commands(message)
 
 # ============
 # run
