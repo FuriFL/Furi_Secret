@@ -26,7 +26,7 @@ TIERS = {
     "cross": {"full": "Cross", "tier": "S", "value": 10000, "allias": ["xsans", "cross sans", "crosssans"]},
     "uf": {"full": "Undying Flame", "tier": "S", "value": 7300},
     "vst": {"full": "Valentine Summer Time", "tier": "S", "value": 7000},
-    "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S", "value": 6520, "allias": ["ew:u rgb", "ewurgb", ew u rgb]},
+    "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S", "value": 6520, "allias": ["ew:u rgb", "ewurgb", "ew u rgb"]},
     "mkvol": {"full": "Midknight Vessel of Life", "tier": "S", "value": 4500, "allias": ["mk vol", "vol"]},
     "mkvolts": {"full": "Midknight Vessel of Life | Taped Shut", "tier": "S", "value": 4000, "allias": ["mk volts"], ["volts"], ["taped shut"]},
     "mimivol": {"full": "Midknight Vessel of Life | Mimicry", "tier": "S", "value": 3500},
