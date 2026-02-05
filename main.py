@@ -551,7 +551,7 @@ async def on_message(message):
             n = max(1, int(parts[2]))
 
         lines = [
-            f"{i}. • {it['full']} (key: {it['key']}) | Value: {it['value']}"
+            f"{i}. • {it['full']} | Value: {it['value']}"
             for i, it in enumerate(items[:n], start=1)
         ]
 
