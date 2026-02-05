@@ -500,32 +500,6 @@ async def on_message(message):
             await send_long_message(message.channel, m)
         return
 
-# ===== LIST SPECIFIC TIER =====
-    if raw.lower().startswith(("list ", "tl ", "tier ")):
-    tier = raw.split(" ", 1)[1].upper()
-
-    valid_tiers = ["U", "EX", "S", "A", "B", "C", "D", "SSR"]
-
-    if tier not in valid_tiers:
-        await message.channel.send(
-            "❌ Unknown tier\nAvailable: U, EX, S, A, B, C, D"
-        )
-        return
-
-    lines = []
-    for key, data in TIERS.items():
-        if data.get("tier") == tier:
-            value = data.get("value", 0)
-            lines.append(f"• **{data['full']}** — `{value}`")
-
-    if not lines:
-        await message.channel.send(f"⚠️ No specs found in **{tier}** tier")
-        return
-
-    text = f"===== **{tier} Tier** =====\n\n" + "\n".join(lines)
-    await send_long_message(message.channel, text)
-    return
-
     # If user asked for tierlist (backwards compatible)
     if raw.lower() in ["tierlist", "tl"]:
         # send tierlist image (must exist in project root)
