@@ -584,7 +584,7 @@ async def on_message(message):
             return
 
         lines = [f"• {full} | value: {value} | key: {key}" for key, full, value in entries]
-        text = f"===== {tier} Tier =====\n\n" + "\n".join(lines)
+        text = f"💮 ===== {tier} Tier ===== 💮\n\n" + "\n".join(lines)
         await send_long_message(message.channel, text)
         return
 
