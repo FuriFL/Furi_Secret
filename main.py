@@ -185,11 +185,11 @@ TIERS = {
     "silver egg": {"full": "Silver Egg", "tier": "D", "value": 20},  
 
     # (ตัวอย่างพิเศษ — สามารถลบหรือแก้ได้ตามต้องการ)
-    "bronya": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
-    "bronya zaychik": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
-    "bronya rand": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
-    "silver wolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
-    "silverwolf": {"full": "Furi's Wife", "tier": "SSR", "value": 999999},
+    "bronya": {"full": "Furi's Wife", "tier": "SPECIAL", "value": 999999},
+    "bronya zaychik": {"full": "Furi's Wife", "SPECIAL": "SSR", "value": 999999},
+    "bronya rand": {"full": "Furi's Wife", "SPECIAL": "SSR", "value": 999999},
+    "silver wolf": {"full": "Furi's Wife", "SPECIAL": "SSR", "value": 999999},
+    "silverwolf": {"full": "Furi's Wife", "SPECIAL": "SSR", "value": 999999},
     "Furi": {"full": "Furidamu", "tier": "Bronya's Wife", "value": 171108},
 }
 
