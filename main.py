@@ -207,49 +207,77 @@ def normalize(s: str) -> str:
 
 def find_entry_by_query(q: str):
     """
-    Find an entry in TIERS by:
-    1) exact key
-    2) normalized key / full / alias
-    3) partial match (key / full / alias)
-
-    Returns (key, data) or (None, None)
+    Improved matching:
+    - exact key match (TIERS key)
+    - normalized key / full-name match
+    - exact alias match (supports alias / aliases / allias fields)
+    - fallback: token-overlap scoring (choose best match by shared tokens)
+    Returns tuple (key, data) or (None, None)
     """
     q_norm = normalize(q)
+    q_tokens = set(q_norm.split()) if q_norm else set()
 
-    # ---------- 1) exact key ----------
+    # 1) direct key match (exact)
     if q_norm in TIERS:
         return q_norm, TIERS[q_norm]
 
-    # ---------- 2) normalized exact ----------
+    # helper to get aliases list from an entry (tolerant to different keys)
+    def get_alias_list(data):
+        for k in ("alias", "aliases", "allias", "alliases"):
+            v = data.get(k)
+            if not v:
+                continue
+            # if single string, wrap in list
+            if isinstance(v, str):
+                return [v]
+            if isinstance(v, (list, tuple)):
+                return list(v)
+        return []
+
+    # 2) try match full names, normalized keys and aliases (exact)
     for key, data in TIERS.items():
-        key_norm = normalize(key)
-
-        if key_norm == q_norm:
+        # normalized shorthand key
+        if normalize(key) == q_norm:
             return key, data
-
-        full_norm = normalize(data.get("full", ""))
-        if full_norm == q_norm:
+        # normalized full name
+        if normalize(data.get("full", "")) == q_norm:
             return key, data
-
-        for alias in data.get("alias", []):
-            if normalize(alias) == q_norm:
+        # aliases exact match
+        for a in get_alias_list(data):
+            if normalize(a) == q_norm:
                 return key, data
 
-    # ---------- 3) partial match ----------
+    # 3) token-overlap scoring fallback
+    best = None
+    best_score = 0
+    best_fraction = 0.0  # tie-breaker: fraction of name covered
     for key, data in TIERS.items():
-        key_norm = normalize(key)
-        full_norm = normalize(data.get("full", ""))
+        # collect candidate names to compare: full + key + aliases
+        candidates = [data.get("full", ""), key] + get_alias_list(data)
+        for name in candidates:
+            name_norm = normalize(name)
+            if not name_norm:
+                continue
+            name_tokens = set(name_norm.split())
+            if not name_tokens:
+                continue
 
-        if q_norm in key_norm or key_norm in q_norm:
-            return key, data
+            # compute intersection
+            inter = q_tokens & name_tokens
+            score = len(inter)
+            if score == 0:
+                continue
 
-        if q_norm in full_norm or full_norm in q_norm:
-            return key, data
+            fraction = score / len(name_tokens)  # how much of candidate matched
 
-        for alias in data.get("alias", []):
-            alias_norm = normalize(alias)
-            if q_norm in alias_norm or alias_norm in q_norm:
-                return key, data
+            # choose better by (score, fraction)
+            if (score > best_score) or (score == best_score and fraction > best_fraction):
+                best = (key, data)
+                best_score = score
+                best_fraction = fraction
+
+    if best:
+        return best[0], best[1]
 
     return None, None
 
