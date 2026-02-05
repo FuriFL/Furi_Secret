@@ -148,7 +148,7 @@ TIERS = {
     "anubis spook": {"full": "Anubis | Spook", "tier": "C", "value": 400},  
     "hamon frost": {"full": "Hamon | Frost", "tier": "C", "value": 370},  
     "hohe": {"full": "Herrscher of Human Ego", "tier": "C", "value": 360},  
-    "c-moon": {"full": "C-Moon", "tier": "C", "value": 340},  
+    "cmoon": {"full": "C-Moon", "tier": "C", "value": 340},  
     "baiken": {"full": "Baiken", "tier": "C", "value": 340},  
     "sanji sakurian": {"full": "Sanji (Sakurian)", "tier": "C", "value": 380},  
     "okarun": {"full": "Okarun", "tier": "C", "value": 320},  
