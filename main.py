@@ -23,7 +23,7 @@ TIERS = {
     "solemn": {"full": "Cross | Butterflies' Funeral", "tier": "EX", "value": 20000},
 
     # ===== S =====
-    "cross": {"full": "Cross", "tier": "S", "value": 10000, "allias": ["xsans", "cross sans", "crosssans"]}
+    "cross": {"full": "Cross", "tier": "S", "value": 10000, "allias": ["xsans", "cross sans", "crosssans"]},
     "uf": {"full": "Undying Flame", "tier": "S", "value": 7300},
     "vst": {"full": "Valentine Summer Time", "tier": "S", "value": 7000},
     "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S", "value": 6520, "allias": ["ew:u rgb", "ewurgb", ew u rgb]},
