@@ -459,6 +459,31 @@ async def on_message(message):
         await message.channel.send("❗ Usage: `@FuriBOT find <name>` or `@FuriBOT tl` (tierlist) or `@FuriBOT my <items> for <items>`")
         return
 
+    # ===== HELP COMMAND =====
+    if raw.lower() in ["help", "commands", "cmd", "h"]:
+        await message.channel.send(
+            "✨ **HELP | FuriBOT** ✨\n\n"
+            "════════════════════\n"
+            "📜 **ALL COMMANDS**\n"
+            "════════════════════\n\n"
+            "🔹 **@FuriBOT tierlist**\n"
+            "→ Show tierlist image\n\n"
+            "🔹 **@FuriBOT tierlist all**\n"
+            "→ Show all specs with Tier & Value\n\n"
+            "🔹 **@FuriBOT find <name>**\n"
+            "→ Find spec Tier & Value\n"
+            "Example: `@FuriBOT find vergil`\n\n"
+            "🔹 **@FuriBOT my <items> for <items>**\n"
+            "→ Check W / F / L by value\n"
+            "Example: `@FuriBOT my ew+hie for kujo's hat+silver egg`\n\n"
+            "════════════════════\n"
+            "⚠️ **Note**\n"
+            "════════════════════\n"
+            "Value points of specs are **NOT official**.\n"
+            "Please don’t fully trust them • this list is still under development and balancing"
+        )
+        return
+        
     # normalize leading spaces and collapse multiple spaces
     raw = re.sub(r"\s+", " ", raw).strip()
 
