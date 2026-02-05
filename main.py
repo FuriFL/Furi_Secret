@@ -551,13 +551,13 @@ async def on_message(message):
             n = max(1, int(parts[2]))
 
         lines = [
-            f"{i}. **{it['full']}** (key: {it['key']}) | Value: {it['value']}"
+            f"{i}. • {it['full']} (key: {it['key']}) | Value: {it['value']}"
             for i, it in enumerate(items[:n], start=1)
         ]
 
         await send_long_message(
             message.channel,
-            f"💮 **TOPLIST | Tier {tier}** 💮\n\n" + "\n".join(lines)
+            f"💮 TOPLIST | Tier {tier} 💮\n\n" + "\n".join(lines)
         )
         return
 
