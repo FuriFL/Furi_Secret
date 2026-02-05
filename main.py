@@ -456,6 +456,8 @@ async def on_message(message):
             "→ Show tierlist image\n\n"
             "💮 **@FuriBOT tierlist all**\n"
             "→ Show all specs with Tier & Value\n\n"
+            "💮 **@FuriBOT list <tier>**\n"
+            "→ Show all specs in a specific tier\n\n"
             "💮 **@FuriBOT find <name>**\n"
             "→ Find spec Tier & Value\n"
             "Example: `@FuriBOT find vst`\n\n"
