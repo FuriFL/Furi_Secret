@@ -26,9 +26,9 @@ TIERS = {
     "uf": {"full": "Undying Flame", "tier": "S", "value": 7300},
     "vst": {"full": "Valentine Summer Time", "tier": "S", "value": 7000},
     "ewu rgb": {"full": "Eternal Wing | RGB | UNLEASHED", "tier": "S", "value": 6520, "allias": ["ew:u rgb", "ewurgb", "ew u rgb"]},
-    "mkvol": {"full": "Midknight Vessel of Life", "tier": "S", "value": 4500, "allias": ["mk vol", "vol"]},
-    "mkvolts": {"full": "Midknight Vessel of Life | Taped Shut", "tier": "S", "value": 4000, "allias": ["mk volts", "volts", "taped shut"]},
-    "mimivol": {"full": "Midknight Vessel of Life | Mimicry", "tier": "S", "value": 3500, "allias": ["mimi", "mkvol mimicry"]},
+    "mkvol": {"full": "Midknight Vessel of Life", "tier": "S", "value": 5000, "allias": ["mk vol", "vol"]},
+    "mkvolts": {"full": "Midknight Vessel of Life | Taped Shut", "tier": "S", "value": 5500, "allias": ["mk volts", "volts", "taped shut"]},
+    "mimivol": {"full": "Midknight Vessel of Life | Mimicry", "tier": "S", "value": 4000, "allias": ["mimi", "mkvol mimicry"]},
 
     # ===== A =====
     "wh": {"full": "Wild Hunt", "tier": "A", "value": 3500, "allias": ["wildhunt"]},
@@ -38,7 +38,7 @@ TIERS = {
     "tuna": {"full": "Anubis Requiem | Tuna", "tier": "A", "value": 3500},
     "ewu": {"full": "Eternal Wing | Unleashed", "tier": "A", "value": 1630, "allias": ["ew:u", "ew u"]},
     "5th sinner": {"full": "Lei Heng | The 5th Sinner", "tier": "A", "value": 1570},
-    "fx!chara": {"full": "X!Chara : Frostbite", "tier": "A", "value": 1400, "allias": ["fxchara", "x!chara frostbite", "xcharaf", "x!charaf", "x!chara f", "xchara f"]},
+    "fx!chara": {"full": "X!Chara : Frostbite", "tier": "A", "value": 1380, "allias": ["fxchara", "x!chara frostbite", "xcharaf", "x!charaf", "x!chara f", "xchara f"]},
     "duf": {"full": "Dullahan | Unyielding Frost", "tier": "A", "value": 1135},
     "se": {"full": "Singularity Essence", "tier": "A", "value": 1300},
     "mkb": {"full": "Midknight", "tier": "A", "value": 1135, "allias": ["mk", "seele"]},
