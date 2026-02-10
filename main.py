@@ -476,7 +476,7 @@ async def on_message(message):
     raw = message.content.replace(client.user.mention, "").strip()
 
     if not raw:
-        await message.channel.send("❗ Usage: `@FuriBOT find <name>` or `@FuriBOT tl` (tierlist) or `@FuriBOT my <items> for <items>`")
+        await message.channel.send("🌸 Heyya! I'm here trying to use `@FuriBOT help` to see all command!")
         return
 
     # ===== HELP COMMAND =====
