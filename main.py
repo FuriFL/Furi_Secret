@@ -501,7 +501,7 @@ async def on_ready():
         status=discord.Status.online,
         activity=discord.Activity(
             type=discord.ActivityType.watching,
-            name="@FuriBOT find <name>  |  @FuriBOT tl  |  @FuriBOT my <items> for <items>"
+            name="I love Bronya so much"
         )
     )
     print(f"Logged in as {client.user}")
