@@ -614,10 +614,6 @@ async def on_message(message):
             "→ Check W / F / L by value\n\n"
             "💮 **@FuriBOT check / update / changelog**\n"
             "→ Show latest update log\n\n"
-            "💮 **@FuriBOT send [<channel_id>] <message>**\n"
-            "→ (Owner only) Forward message to another channel (channel_id optional; uses default if omitted)\n\n"
-            "💮 **@FuriBOT sendimg <channel_id>**\n"
-            "→ (Owner only) Attach images with this command to relay them to target channel\n\n"
             "════════════════════"
         )
         return
@@ -732,7 +728,7 @@ async def on_message(message):
             if att.size is not None and att.size > MAX_FILE_SIZE:
                 # too large: send URL instead of file
                 try:
-                    await target_channel.send(f"🖼️ Image from **{message.author}** (file too large to attach): {att.url}")
+                    await target_channel.send(f"💜 Image from **Furi** (file too large to attach): {att.url}")
                     sent += 1
                 except Exception as e:
                     failed.append((att.filename, str(e)))
@@ -741,7 +737,7 @@ async def on_message(message):
             # try to forward as file
             try:
                 file = await att.to_file()
-                await target_channel.send(content=f"🖼️ Image from **{message.author}**", file=file)
+                await target_channel.send(content=f"💜 Image from **Furi**", file=file)
                 sent += 1
             except Exception as e:
                 failed.append((att.filename, str(e)))
