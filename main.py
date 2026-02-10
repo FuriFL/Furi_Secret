@@ -199,9 +199,10 @@ UPDATE_LOG = {
     "version": "1.6",
     "title": "FuriBOT update version 1.6!",
     "changes": [
-        "เพิ่มคำสั่ง toplist เพื่อเรียก top N แยกตาม tier",
-        "ปรับระบบค้นหา alias ให้ยืดหยุ่นขึ้น",
-        "แก้บัคเรื่องการแสดงชื่อให้รับช่องว่างมากขึ้น",
+        "Added a new command to check the update log! `@FuriBOT update`",
+        "Adjusted balance values for some specs!",
+        "Improved and expanded search keywords for S-tier specs!",
+        "Adjust the wording and style to be softer so it can be used in large servers without any issues!",
     ],
     "date": "02/06/2026",
 }
