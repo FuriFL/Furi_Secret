@@ -492,76 +492,7 @@ async def send_long_message(channel, text):
         await channel.send("".join(chunk))
 
 
-# ============
-# events
-# ============
-@client.event
-async def on_ready():
-    await client.change_presence(
-        status=discord.Status.online,
-        activity=discord.Activity(
-            type=discord.ActivityType.watching,
-            name="I love Bronya so much"
-        )
-    )
-    print(f"Logged in as {client.user}")
 
-
-@client.event
-async def on_message(message):
-    if message.author.bot:
-        return
-
-    # only react when bot is mentioned
-    if client.user not in message.mentions:
-        return
-
-    # original content without mention
-    raw = message.content.replace(client.user.mention, "").strip()
-
-    if not raw:
-        await message.channel.send("🌸 Heyya! I'm here trying to use `@FuriBOT help` to see all command!")
-        return
-
-    # ===== HELP COMMAND =====
-    if raw.lower() in ["help", "commands", "cmd", "h"]:
-        await message.channel.send(
-            "🌸 **HELP | FuriBOT** 🌸\n\n"
-            "════════════════════\n"
-            "📜 **ALL COMMANDS**\n"
-            "════════════════════\n\n"
-            "💮 **@FuriBOT tierlist**\n"
-            "→ Show tierlist image\n\n"
-            "💮 **@FuriBOT tierlist all**\n"
-            "→ Show all specs with Tier & Value\n\n"
-            "💮 **@FuriBOT list <tier>**\n"
-            "→ Show all specs in a specific tier (sorted by value desc)\n\n"
-            "💮 **@FuriBOT toplist <tier> [N]**\n"
-            "→ Show top N specs in that tier (default N=10). Example: `@FuriBOT toplist A 5`\n\n"
-            "💮 **@FuriBOT find <name>**\n"
-            "→ Find spec Tier & Value\n"
-            "Example: `@FuriBOT find vst`\n\n"
-            "💮 **@FuriBOT my <items> for <items>**\n"
-            "→ Check W / F / L by value\n"
-            "Example: `@FuriBOT my ewu+ewu rgb for mkb+mkvol`\n\n"
-            "💮 **@FuriBOT check / update / changelog**\n"
-            "→ Show latest update log\n\n"
-            "════════════════════\n"
-            "⚠️ **Note**\n"
-            "════════════════════\n"
-            "Value points of specs are **NOT official**.\n"
-            "Please don’t fully trust them • this list is still under development and balancing"
-        )
-        return
-
-    # normalize leading spaces and collapse multiple spaces
-    raw = re.sub(r"\s+", " ", raw).strip()
-
-    # ===== WFL command (ต้องเริ่มด้วย my ) =====
-    if raw.lower().startswith("my "):
-        reply = wfl_command(raw)
-        await message.channel.send(reply)
-        return
 # ============
 # events
 # ============
@@ -681,8 +612,6 @@ async def on_message(message):
             "→ Check W / F / L by value\n\n"
             "💮 **@FuriBOT check / update / changelog**\n"
             "→ Show latest update log\n\n"
-            "💮 **@FuriBOT send [<channel_id>] <message>**\n"
-            "→ (Owner only) Forward message to another channel (channel_id optional; uses default if omitted)\n\n"
             "════════════════════"
         )
         return
