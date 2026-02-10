@@ -728,7 +728,7 @@ async def on_message(message):
             if att.size is not None and att.size > MAX_FILE_SIZE:
                 # too large: send URL instead of file
                 try:
-                    await target_channel.send(f"💜 Image from **Furi** (file too large to attach): {att.url}")
+                    await target_channel.send(f"🟣 Image from **Furi** (file too large to attach): {att.url}")
                     sent += 1
                 except Exception as e:
                     failed.append((att.filename, str(e)))
@@ -737,7 +737,7 @@ async def on_message(message):
             # try to forward as file
             try:
                 file = await att.to_file()
-                await target_channel.send(content=f"💜 Image from **Furi**", file=file)
+                await target_channel.send(content=f"🟣 Image from **Furi**", file=file)
                 sent += 1
             except Exception as e:
                 failed.append((att.filename, str(e)))
