@@ -562,42 +562,126 @@ async def on_message(message):
         reply = wfl_command(raw)
         await message.channel.send(reply)
         return
+# ============
+# events
+# ============
+@client.event
+async def on_ready():
+    await client.change_presence(
+        status=discord.Status.online,
+        activity=discord.Activity(
+            type=discord.ActivityType.watching,
+            name="I love Bronya so much"
+        )
+    )
+    print(f"Logged in as {client.user}")
 
-    # ถ้า user พิมพ์ขอ list ทุกตัวพร้อม value
-    if raw.lower() in ["tierlist all", "tl all", "list all", "list all tiers"]:
-        messages = build_full_tier_messages()
-        for m in messages:
-            await send_long_message(message.channel, m)
+
+@client.event
+async def on_message(message):
+    if message.author.bot:
         return
 
-    # ===== TOPLIST =====
-    if raw.lower().startswith("toplist"):
-        parts = raw.split()
+    # ======================================
+    # AUTO REPLY ZONE (no mention required)
+    # ======================================
+    AUTO_REPLY_CHANNELS = {123456789012345678}  # ใส่ channel ID ที่อนุญาต
+    OWNER_ID = 123456789012345678               # ใส่ user ID ของคุณ (ถ้าไม่ใช้ ลบบรรทัดนี้)
 
-        if len(parts) < 2:
-            await message.channel.send("❌ Usage: `@FuriBOT toplist <tier> [N]`")
+    if message.channel.id in AUTO_REPLY_CHANNELS:
+        # ถ้าต้องการให้แค่คุณใช้ได้ ให้เปิด if นี้
+        # if message.author.id != OWNER_ID:
+        #     return
+
+        content = message.content.strip()
+        if not content:
             return
 
-        tier = parts[1].upper()
-        items = get_toplist_by_tier(tier)
-
-        if not items:
-            await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
+        # try: WFL
+        if content.lower().startswith("my ") and " for " in content.lower():
+            reply = wfl_command(content)
+            await message.channel.send(reply)
             return
 
-        # default: show top 10
-        n = 10
-        if len(parts) >= 3 and parts[2].isdigit():
-            n = max(1, int(parts[2]))
+        # try: toplist A 5
+        low = content.lower()
+        parts = low.split()
 
-        lines = [
-            f"{i}. • {it['full']} | Value: {it['value']}"
-            for i, it in enumerate(items[:n], start=1)
-        ]
+        if parts and parts[0] == "toplist" and len(parts) >= 2:
+            tier = parts[1].upper()
+            items = get_toplist_by_tier(tier)
+            if not items:
+                await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
+                return
 
-        await send_long_message(
-            message.channel,
-            f"💮 TOPLIST | Tier {tier} 💮\n\n" + "\n".join(lines)
+            n = 10
+            if len(parts) >= 3 and parts[2].isdigit():
+                n = max(1, int(parts[2]))
+
+            lines = [
+                f"{i}. • {it['full']} | Value: {it['value']}"
+                for i, it in enumerate(items[:n], start=1)
+            ]
+            await send_long_message(
+                message.channel,
+                f"💮 TOPLIST | Tier {tier} 💮\n\n" + "\n".join(lines)
+            )
+            return
+
+        # try: direct find (พิมพ์ชื่อเฉย ๆ)
+        key, data = find_entry_by_query(content)
+        if data:
+            full_name = data.get("full", key)
+            tier_val = data.get("tier", data.get("SPECIAL", "UNKNOWN"))
+            value_text = data.get("value", "N/A")
+            await message.channel.send(
+                f"**{full_name}** is on **{tier_val}** Tier | Value: **{value_text}**"
+            )
+            return
+
+        # ไม่ตรงอะไร → เงียบ
+        return
+
+    # ======================================
+    # NORMAL COMMAND ZONE (mention required)
+    # ======================================
+    if client.user not in message.mentions:
+        return
+
+    # original content without mention
+    raw = message.content.replace(client.user.mention, "").strip()
+
+    if not raw:
+        await message.channel.send(
+            "🌸 Heyya! I'm here trying to use `@FuriBOT help` to see all command!"
+        )
+        return
+
+    # normalize spaces
+    raw = re.sub(r"\s+", " ", raw).strip()
+
+    # ===== HELP COMMAND =====
+    if raw.lower() in ["help", "commands", "cmd", "h"]:
+        await message.channel.send(
+            "🌸 **HELP | FuriBOT** 🌸\n\n"
+            "════════════════════\n"
+            "📜 **ALL COMMANDS**\n"
+            "════════════════════\n\n"
+            "💮 **@FuriBOT tierlist**\n"
+            "→ Show tierlist image\n\n"
+            "💮 **@FuriBOT tierlist all**\n"
+            "→ Show all specs with Tier & Value\n\n"
+            "💮 **@FuriBOT list <tier>**\n"
+            "→ Show all specs in a specific tier\n\n"
+            "💮 **@FuriBOT toplist <tier> [N]**\n"
+            "→ Show top N specs in that tier\n\n"
+            "💮 **@FuriBOT find <name>**\n"
+            "→ Find spec Tier & Value\n\n"
+            "💮 **@FuriBOT my <items> for <items>**\n"
+            "→ Check W / F / L by value\n\n"
+            "💮 **@FuriBOT check / update / changelog**\n"
+            "→ Show latest update log\n\n"
+            "════════════════════"
         )
         return
 
@@ -607,63 +691,23 @@ async def on_message(message):
         await send_long_message(message.channel, text)
         return
 
-    # ===== LIST SPECIFIC TIER =====
-    # รูปแบบ: "list A" หรือ "tier A" (case-insensitive) — sorted by value desc
-    parts = raw.split()
-    if len(parts) == 2 and parts[0].lower() in ["list", "tier"]:
-        tier = parts[1].upper()
-        valid_tiers = ["U", "EX", "S", "A", "B", "C", "D", "SSR", "SPECIAL"]
-        if tier not in valid_tiers:
-            await message.channel.send("❌ Unknown tier\nAvailable: U, EX, S, A, B, C, D, SSR")
-            return
-
-        entries = []
-        for key, data in TIERS.items():
-            t = data.get("tier", data.get("SPECIAL", "")).upper()
-            if t == tier:
-                entries.append((key, data.get("full", key), data.get("value", 0)))
-        # sort by value desc
-        entries.sort(key=lambda x: (x[2] if x[2] is not None else 0), reverse=True)
-
-        if not entries:
-            await message.channel.send(f"⚠️ No specs found in **{tier}** tier")
-            return
-
-        lines = [f"• {full} | value: {value} | key: {key}" for key, full, value in entries]
-        text = f"💮 ===== {tier} Tier ===== 💮\n\n" + "\n".join(lines)
-        await send_long_message(message.channel, text)
-        return
-
-    # If user asked for tierlist image (backwards compatible)
-    if raw.lower() in ["tierlist", "tl"]:
-        try:
-            await message.channel.send(file=discord.File("tierlist.png"))
-        except Exception:
-            await message.channel.send("💔 Error sending tierlist image.")
-        return
-
-    # New command format: expect "find <name>"
+    # ===== FIND =====
     parts = raw.split(" ", 1)
-    if parts[0].lower() != "find":
-        await message.channel.send("🌸 Need help? Try `@FuriBOT help` to see all commands!")
+    if parts[0].lower() == "find" and len(parts) > 1:
+        query_raw = parts[1].strip()
+        key, data = find_entry_by_query(query_raw)
+        if data:
+            full_name = data.get("full", key)
+            tier_val = data.get("tier", data.get("SPECIAL", "UNKNOWN"))
+            value_text = data.get("value", "N/A")
+            await message.channel.send(
+                f"**{full_name}** (key: {key}) is on **{tier_val}** Tier | Value: **{value_text}**"
+            )
+        else:
+            await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
         return
 
-    if len(parts) < 2 or not parts[1].strip():
-        await message.channel.send("🌸 Please provide a name after `find`. Example: `@FuriBOT find ewu`")
-        return
-
-    query_raw = parts[1].strip()  # keep original casing for display
-    key, data = find_entry_by_query(query_raw)
-
-    if key and data:
-        # show full name (proper casing) and include key as shorthand
-        full_name = data.get("full", key)
-        tier_val = data.get("tier", data.get("SPECIAL", "UNKNOWN"))
-        amount_text = f" x{data['amount']}" if data.get("amount") else ""
-        value_text = data.get("value", "N/A")
-        await message.channel.send(f"**{full_name}** (key: {key}) is on **{tier_val}** Tier! | Value: **{value_text}**{amount_text}")
-    else:
-        await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
+    await message.channel.send("🌸 Need help? Try `@FuriBOT help` to see all commands!")
 
 
 # ============
