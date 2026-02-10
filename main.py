@@ -589,21 +589,21 @@ async def on_message(message):
     OWNER_ID = 1240907019402219541               # ใส่ user ID ของคุณ (ถ้าไม่ใช้ ลบบรรทัดนี้)
 
     if message.channel.id in AUTO_REPLY_CHANNELS:
-        # ถ้าต้องการให้แค่คุณใช้ได้ ให้เปิด if นี้
-        # if message.author.id != OWNER_ID:
+        # ถ้าต้องการให้แค่คุณใช้ได้ ให้เปิดเงื่อนไขนี้
+        # if OWNER_ID and message.author.id != OWNER_ID:
         #     return
 
         content = message.content.strip()
         if not content:
             return
 
-        # try: WFL
+        # try: WFL (my ... for ...)
         if content.lower().startswith("my ") and " for " in content.lower():
             reply = wfl_command(content)
             await message.channel.send(reply)
             return
 
-        # try: toplist A 5
+        # try: toplist <tier> [N]
         low = content.lower()
         parts = low.split()
 
@@ -681,8 +681,73 @@ async def on_message(message):
             "→ Check W / F / L by value\n\n"
             "💮 **@FuriBOT check / update / changelog**\n"
             "→ Show latest update log\n\n"
+            "💮 **@FuriBOT send [<channel_id>] <message>**\n"
+            "→ (Owner only) Forward message to another channel (channel_id optional; uses default if omitted)\n\n"
             "════════════════════"
         )
+        return
+
+    # ===== REMOTE SEND (cross-server) =====
+    # Usage:
+    #  - @FuriBOT send This is a test
+    #    -> sends to default remote channel (set below)
+    #  - @FuriBOT send 123456789012345678 Hello there
+    #    -> sends to channel with id 123456789012345678
+    DEFAULT_REMOTE_CHANNEL_ID = 1240907019402219541  # แก้เป็นค่า default ของคุณ
+    if raw.lower().startswith("send "):
+        # owner-only
+        if OWNER_ID and message.author.id != OWNER_ID:
+            await message.channel.send("🔒 Permission denied. Only the owner can use `send`.")
+            return
+
+        # split into at most 3 parts: "send", "<maybe_channel>", "<rest message>"
+        parts = raw.split(" ", 2)
+        # parts[0] == "send"
+        if len(parts) == 1 or (len(parts) == 2 and not parts[1].strip()):
+            await message.channel.send("❌ Usage: `@FuriBOT send [<channel_id>] <message>`")
+            return
+
+        # determine target channel id and message
+        target_channel_id = None
+        message_text = None
+
+        # case: @FuriBOT send <channel_id> <message>
+        if len(parts) >= 3 and re.fullmatch(r"\d{17,19}", parts[1]):
+            try:
+                target_channel_id = int(parts[1])
+                message_text = parts[2].strip()
+            except Exception:
+                target_channel_id = None
+
+        # case: channel mention like <#123456...>
+        elif len(parts) >= 3 and parts[1].startswith("<#") and parts[1].endswith(">"):
+            m = re.search(r"\d+", parts[1])
+            if m:
+                target_channel_id = int(m.group(0))
+                message_text = parts[2].strip()
+
+        # case: no channel provided -> use default; message is parts[1] (and maybe parts[2] empty)
+        else:
+            target_channel_id = DEFAULT_REMOTE_CHANNEL_ID
+            message_text = raw[len("send "):].strip()
+
+        if not message_text:
+            await message.channel.send("❌ No message provided to send.")
+            return
+
+        # fetch channel object
+        channel = client.get_channel(target_channel_id)
+        if channel is None:
+            await message.channel.send("❌ Target channel not found or bot is not in that channel's server.")
+            return
+
+        try:
+            await channel.send(message_text)
+        except Exception as e:
+            await message.channel.send(f"💔 Failed to send message: {e}")
+            return
+
+        await message.channel.send("✅ Message forwarded successfully!")
         return
 
     # ===== UPDATE LOG =====
