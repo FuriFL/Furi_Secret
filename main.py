@@ -600,11 +600,11 @@ async def on_message(message):
     # New command format: expect "find <name>"
     parts = raw.split(" ", 1)
     if parts[0].lower() != "find":
-        await message.channel.send("😡 Please use `@FuriBOT find <name>` to search for a spec/stand, `@FuriBOT tl` for the tierlist image, or `@FuriBOT my <items> for <items>` for W/F/L.")
+        await message.channel.send("🌸 Need help? Try `@FuriBOT help` to see all commands!")
         return
 
     if len(parts) < 2 or not parts[1].strip():
-        await message.channel.send("😡 Please provide a name after `find`. Example: `@FuriBOT find ewu`")
+        await message.channel.send("🌸 Please provide a name after `find`. Example: `@FuriBOT find ewu`")
         return
 
     query_raw = parts[1].strip()  # keep original casing for display
