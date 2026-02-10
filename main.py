@@ -525,6 +525,8 @@ async def on_message(message):
         #     return
 
         content = message.content.strip()
+        # ถ้ามีแนบรูปแต่ไม่มี text (เช่น ผู้ใช้โพสต์รูปเฉย ๆ) ให้ยังตรวจหา image
+        # แต่ใน AUTO_REPLY เราจะตอบเฉพาะคำสั่งข้อความ/ชื่อเท่านั้น
         if not content:
             return
 
@@ -612,26 +614,23 @@ async def on_message(message):
             "→ Check W / F / L by value\n\n"
             "💮 **@FuriBOT check / update / changelog**\n"
             "→ Show latest update log\n\n"
+            "💮 **@FuriBOT send [<channel_id>] <message>**\n"
+            "→ (Owner only) Forward message to another channel (channel_id optional; uses default if omitted)\n\n"
+            "💮 **@FuriBOT sendimg <channel_id>**\n"
+            "→ (Owner only) Attach images with this command to relay them to target channel\n\n"
             "════════════════════"
         )
         return
 
-    # ===== REMOTE SEND (cross-server) =====
-    # Usage:
-    #  - @FuriBOT send This is a test
-    #    -> sends to default remote channel (set below)
-    #  - @FuriBOT send 123456789012345678 Hello there
-    #    -> sends to channel with id 123456789012345678
-    DEFAULT_REMOTE_CHANNEL_ID = 1240907019402219541  # แก้เป็นค่า default ของคุณ
+    # ===== REMOTE SEND (cross-server text) =====
+    DEFAULT_REMOTE_CHANNEL_ID = 1468374226850287619  # แก้เป็นค่า default ของคุณ
     if raw.lower().startswith("send "):
         # owner-only
         if OWNER_ID and message.author.id != OWNER_ID:
             await message.channel.send("🔒 Permission denied. Only the owner can use `send`.")
             return
 
-        # split into at most 3 parts: "send", "<maybe_channel>", "<rest message>"
         parts = raw.split(" ", 2)
-        # parts[0] == "send"
         if len(parts) == 1 or (len(parts) == 2 and not parts[1].strip()):
             await message.channel.send("❌ Usage: `@FuriBOT send [<channel_id>] <message>`")
             return
@@ -640,22 +639,17 @@ async def on_message(message):
         target_channel_id = None
         message_text = None
 
-        # case: @FuriBOT send <channel_id> <message>
         if len(parts) >= 3 and re.fullmatch(r"\d{17,19}", parts[1]):
             try:
                 target_channel_id = int(parts[1])
                 message_text = parts[2].strip()
             except Exception:
                 target_channel_id = None
-
-        # case: channel mention like <#123456...>
         elif len(parts) >= 3 and parts[1].startswith("<#") and parts[1].endswith(">"):
             m = re.search(r"\d+", parts[1])
             if m:
                 target_channel_id = int(m.group(0))
                 message_text = parts[2].strip()
-
-        # case: no channel provided -> use default; message is parts[1] (and maybe parts[2] empty)
         else:
             target_channel_id = DEFAULT_REMOTE_CHANNEL_ID
             message_text = raw[len("send "):].strip()
@@ -664,7 +658,6 @@ async def on_message(message):
             await message.channel.send("❌ No message provided to send.")
             return
 
-        # fetch channel object
         channel = client.get_channel(target_channel_id)
         if channel is None:
             await message.channel.send("❌ Target channel not found or bot is not in that channel's server.")
@@ -677,6 +670,93 @@ async def on_message(message):
             return
 
         await message.channel.send("✅ Message forwarded successfully!")
+        return
+
+    # ===== SEND IMAGE CROSS-SERVER =====
+    # Usage:
+    #  - @FuriBOT sendimg <channel_id> (attach images)
+    #  - channel_id can be ID or channel mention <#id>
+    if raw.lower().startswith("sendimg"):
+        # owner-only
+        if OWNER_ID and message.author.id != OWNER_ID:
+            await message.channel.send("🔒 Permission denied. Only the owner can use `sendimg`.")
+            return
+
+        parts = raw.split(" ", 2)
+        if len(parts) < 2:
+            await message.channel.send("❌ Usage: `@FuriBOT sendimg <channel_id>` (attach image files)")
+            return
+
+        # get target channel id
+        target_channel_id = None
+        if re.fullmatch(r"\d{17,19}", parts[1]):
+            target_channel_id = int(parts[1])
+        elif parts[1].startswith("<#") and parts[1].endswith(">"):
+            m = re.search(r"\d+", parts[1])
+            if m:
+                target_channel_id = int(m.group(0))
+        else:
+            await message.channel.send("❌ Invalid channel id. Use numeric channel id or <#channel_mention>.")
+            return
+
+        target_channel = client.get_channel(target_channel_id)
+        if target_channel is None:
+            await message.channel.send("❌ Target channel not found or bot is not in that channel's server.")
+            return
+
+        # require attachments
+        if not message.attachments:
+            await message.channel.send("🖼️ Please attach at least one image to relay.")
+            return
+
+        MAX_FILE_SIZE = 8 * 1024 * 1024  # 8 MB default limit (adjust if your server boost allows larger)
+        sent = 0
+        skipped = []
+        failed = []
+
+        for att in message.attachments:
+            # check if attachment is image (some clients set content_type)
+            is_image = False
+            if att.content_type:
+                is_image = att.content_type.startswith("image")
+            else:
+                # fallback: check filename extension
+                fn = att.filename.lower()
+                is_image = any(fn.endswith(ext) for ext in (".png", ".jpg", ".jpeg", ".gif", ".webp"))
+
+            if not is_image:
+                skipped.append(att.filename)
+                continue
+
+            # size check
+            if att.size is not None and att.size > MAX_FILE_SIZE:
+                # too large: send URL instead of file
+                try:
+                    await target_channel.send(f"🖼️ Image from **{message.author}** (file too large to attach): {att.url}")
+                    sent += 1
+                except Exception as e:
+                    failed.append((att.filename, str(e)))
+                continue
+
+            # try to forward as file
+            try:
+                file = await att.to_file()
+                await target_channel.send(content=f"🖼️ Image from **{message.author}**", file=file)
+                sent += 1
+            except Exception as e:
+                failed.append((att.filename, str(e)))
+
+        # report result
+        rep_lines = []
+        rep_lines.append(f"✅ Sent: {sent}")
+        if skipped:
+            rep_lines.append(f"⚠️ Skipped (not images): {', '.join(skipped)}")
+        if failed:
+            rep_lines.append("💔 Failed:")
+            for fn, err in failed:
+                rep_lines.append(f"- {fn}: {err}")
+
+        await send_long_message(message.channel, "\n".join(rep_lines))
         return
 
     # ===== UPDATE LOG =====
