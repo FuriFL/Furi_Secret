@@ -668,6 +668,54 @@ async def on_message(message):
         await message.channel.send("✅ Message forwarded successfully!")
         return
 
+    # ===== JOIN VOICE CROSS-SERVER =====
+    # Usage:
+    #  - @FuriBOT joinvc <voice_channel_id>
+    # Notes:
+    #  - Bot must already be a member of the target guild
+    #  - Owner-only (same pattern as other owner commands)
+    if raw.lower().startswith("joinvc"):
+        # owner-only
+        if OWNER_ID and message.author.id != OWNER_ID:
+            await message.channel.send("🔒 Permission denied. Only the owner can use `joinvc`.")
+            return
+
+        parts = raw.split()
+        if len(parts) < 2:
+            await message.channel.send("❌ Usage: `@FuriBOT joinvc <voice_channel_id>`")
+            return
+
+        # parse channel id (numeric or mention style)
+        voice_channel_id = None
+        if re.fullmatch(r"\d{17,19}", parts[1]):
+            voice_channel_id = int(parts[1])
+        elif parts[1].startswith("<#") and parts[1].endswith(">"):
+            m = re.search(r"\d+", parts[1])
+            if m:
+                voice_channel_id = int(m.group(0))
+        else:
+            await message.channel.send("❌ Invalid channel id. Use numeric channel id or <#channel_mention>.")
+            return
+
+        channel = client.get_channel(voice_channel_id)
+        if channel is None:
+            await message.channel.send("❌ Voice channel not found or bot is not in that channel's server.")
+            return
+
+        # ensure it's a voice channel
+        if not isinstance(channel, discord.VoiceChannel):
+            await message.channel.send("❌ The provided ID is not a voice channel.")
+            return
+
+        try:
+            await channel.connect()
+            await message.channel.send(f"🎧 Joined voice channel **{channel.name}**")
+        except discord.ClientException:
+            await message.channel.send("⚠️ Bot is already connected to a voice channel.")
+        except Exception as e:
+            await message.channel.send(f"💔 Failed to join voice: {e}")
+        return
+
     # ===== SEND IMAGE CROSS-SERVER =====
     # Usage:
     #  - @FuriBOT sendimg <channel_id> (attach images)
