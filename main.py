@@ -585,8 +585,8 @@ async def on_message(message):
     # ======================================
     # AUTO REPLY ZONE (no mention required)
     # ======================================
-    AUTO_REPLY_CHANNELS = {123456789012345678}  # ใส่ channel ID ที่อนุญาต
-    OWNER_ID = 123456789012345678               # ใส่ user ID ของคุณ (ถ้าไม่ใช้ ลบบรรทัดนี้)
+    AUTO_REPLY_CHANNELS = {1468374226850287619}  # ใส่ channel ID ที่อนุญาต
+    OWNER_ID = 1240907019402219541               # ใส่ user ID ของคุณ (ถ้าไม่ใช้ ลบบรรทัดนี้)
 
     if message.channel.id in AUTO_REPLY_CHANNELS:
         # ถ้าต้องการให้แค่คุณใช้ได้ ให้เปิด if นี้
