@@ -193,9 +193,38 @@ TIERS = {
 }
 
 # ============
+# Update log data (example)
+# ============
+UPDATE_LOG = {
+    "version": "1.6",
+    "title": "FuriBOT update version 1.6!",
+    "changes": [
+        "เพิ่มคำสั่ง toplist เพื่อเรียก top N แยกตาม tier",
+        "ปรับระบบค้นหา alias ให้ยืดหยุ่นขึ้น",
+        "แก้บัคเรื่องการแสดงชื่อให้รับช่องว่างมากขึ้น",
+    ],
+    "date": "02/06/2026",
+}
+
+def build_update_message(log: dict) -> str:
+    title = log.get("title", f"FuriBOT update version {log.get('version','?')}")
+    changes = log.get("changes", [])
+    date = log.get("date", "Unknown")
+    out = []
+    out.append(f"🌸 {title} 🌸\n")
+    out.append("What's new?\n")
+    if changes:
+        for c in changes:
+            out.append(f"- {c}")
+    else:
+        out.append("- (no details provided)")
+    out.append("\n")
+    out.append(f"Update Date: {date}")
+    return "\n".join(out)
+
+# ============
 # helpers
 # ============
-
 def normalize(s: str) -> str:
     """Lowercase, trim spaces, collapse spaces, remove surrounding punctuation"""
     if not s:
@@ -500,6 +529,8 @@ async def on_message(message):
             "💮 **@FuriBOT my <items> for <items>**\n"
             "→ Check W / F / L by value\n"
             "Example: `@FuriBOT my ewu+ewu rgb for mkb+mkvol`\n\n"
+            "💮 **@FuriBOT check / update / changelog**\n"
+            "→ Show latest update log\n\n"
             "════════════════════\n"
             "⚠️ **Note**\n"
             "════════════════════\n"
@@ -524,13 +555,6 @@ async def on_message(message):
             await send_long_message(message.channel, m)
         return
 
-# ===== TIERLIST ALL =====
-    if raw.lower() in ["tierlist all", "tl all", "list all", "list all tiers"]:
-        messages = build_full_tier_messages()
-        for m in messages:
-            await send_long_message(message.channel, m)
-        return
-
     # ===== TOPLIST =====
     if raw.lower().startswith("toplist"):
         parts = raw.split()
@@ -546,7 +570,8 @@ async def on_message(message):
             await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
             return
 
-        n = len(items)
+        # default: show top 10
+        n = 10
         if len(parts) >= 3 and parts[2].isdigit():
             n = max(1, int(parts[2]))
 
@@ -559,6 +584,12 @@ async def on_message(message):
             message.channel,
             f"💮 TOPLIST | Tier {tier} 💮\n\n" + "\n".join(lines)
         )
+        return
+
+    # ===== UPDATE LOG =====
+    if raw.lower() in ["check", "update", "changelog"]:
+        text = build_update_message(UPDATE_LOG)
+        await send_long_message(message.channel, text)
         return
 
     # ===== LIST SPECIFIC TIER =====
@@ -588,9 +619,8 @@ async def on_message(message):
         await send_long_message(message.channel, text)
         return
 
-    # If user asked for tierlist (backwards compatible)
+    # If user asked for tierlist image (backwards compatible)
     if raw.lower() in ["tierlist", "tl"]:
-        # send tierlist image (must exist in project root)
         try:
             await message.channel.send(file=discord.File("tierlist.png"))
         except Exception:
