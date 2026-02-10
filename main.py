@@ -207,21 +207,30 @@ UPDATE_LOG = {
 }
 
 def build_update_message(log: dict) -> str:
-    title = log.get("title", f"FuriBOT update version {log.get('version','?')}")
+    title = log.get("title", f"FuriBOT update v{log.get('version','?')}")
     changes = log.get("changes", [])
     date = log.get("date", "Unknown")
+
     out = []
-    out.append(f"🌸 {title} 🌸\n")
-    out.append("What's new?\n")
+    out.append("🌸🌸🌸🌸🌸🌸🌸🌸")
+    out.append(f"💖 {title} 💖")
+    out.append("🌸🌸🌸🌸🌸🌸🌸🌸\n")
+
+    out.append("✨ What’s new~ ✨")
+    out.append("૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ა\n")
+
     if changes:
         for c in changes:
-            out.append(f"- {c}")
+            out.append(f"• {c}")
     else:
-        out.append("- (no details provided)")
-    out.append("\n")
-    out.append(f"Update Date: {date}")
-    return "\n".join(out)
+        out.append("• (ยังไม่มีอะไรใหม่เลย ฮืออ ;-;)")
 
+    out.append("\n🌷🌷🌷🌷🌷🌷🌷🌷")
+    out.append(f"📅 Update Date: {date}")
+    out.append("🌷🌷🌷🌷🌷🌷🌷🌷")
+
+    return "\n".join(out)
+    
 # ============
 # helpers
 # ============
