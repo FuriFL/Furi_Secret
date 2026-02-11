@@ -1,3 +1,4 @@
 discord.py
 python-dotenv
 PyNaCl
+apt-get install ffmpeg
