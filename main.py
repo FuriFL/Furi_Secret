@@ -241,7 +241,7 @@ def build_update_message(log: dict) -> str:
     out.append(line)
     out.append("")
     out.append("✨ What’s new~ ✨")
-    out.append("૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ા")
+    out.append("૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ா")
     out.append("")
 
     if changes:
@@ -576,10 +576,6 @@ async def play_text_sound(
     await asyncio.sleep(0.05)
     await stop_loop()
 
-
-
-
-
 # ============
 # events
 # ============
@@ -662,14 +658,27 @@ async def on_message(message):
         # ไม่ตรงอะไร → เงียบ
         return
 
-    # ======================================
+    ======================================
     # NORMAL COMMAND ZONE (mention required)
     # ======================================
     if client.user not in message.mentions:
         return
 
     # original content without mention
-    raw = message.content.replace(client.user.mention, "").strip()
+    raw = message.content
+
+    # remove mention forms (both plain .mention and <@id>/<@!id>)
+    # keep it robust: remove all occurrences
+    try:
+        # .mention form
+        raw = raw.replace(client.user.mention, "")
+        # <@123...> or <@!123...>
+        raw = re.sub(rf"<@!?\s*{client.user.id}\s*>", "", raw)
+    except Exception:
+        # fallback: try simple regex for any @mention name (less precise)
+        raw = re.sub(rf"<@!?\d+>", "", raw)
+
+    raw = raw.strip()
 
     if not raw:
         await message.channel.send(
@@ -687,9 +696,7 @@ async def on_message(message):
         # allow owner to disable it (owner can still use takecontrol)
         if not (raw.lower().startswith("takecontrol") and OWNER_ID and message.author.id == OWNER_ID):
             if verb not in TAKE_CONTROL_ALLOWED:
-                await message.channel.send(
-                    "💬 Loading..."
-                )
+                # silent block (do nothing)
                 return
 
     # ===== TAKECONTROL =====
@@ -801,7 +808,7 @@ async def on_message(message):
     #  - @FuriBOT joinvc <voice_channel_id>
     # Notes:
     #  - Bot must already be a member of the target guild
-    #  - Owner-only (same pattern as other owner commands)
+    #  - Owner-only
     if raw.lower().startswith("joinvc"):
         # owner-only
         if OWNER_ID and message.author.id != OWNER_ID:
@@ -830,8 +837,8 @@ async def on_message(message):
             await message.channel.send("❌ Voice channel not found or bot is not in that channel's server.")
             return
 
-        # ensure it's a voice channel
-        if not isinstance(channel, discord.VoiceChannel):
+        # ensure it's a voice channel (also accept StageChannel)
+        if not isinstance(channel, (discord.VoiceChannel, discord.StageChannel)):
             await message.channel.send("❌ The provided ID is not a voice channel.")
             return
 
@@ -844,14 +851,38 @@ async def on_message(message):
             await message.channel.send(f"💔 Failed to join voice: {e}")
         return
 
-    # ===== LEAVE / DISCONNECT =====
-    if raw.lower() in ["leave", "disconnect", "dc"]:
-        vc = message.guild.voice_client
-        if vc and vc.is_connected():
-            await vc.disconnect()
-            await message.channel.send("👋 Left the voice channel.")
+    # ===== LEAVE / DISCONNECT (supports optional channel/guild id to leave across servers) =====
+    if raw.lower().startswith("leave") or raw.lower().startswith("disconnect") or raw.lower().startswith("dc"):
+        parts = raw.split()
+        target_guild = None
+        # if given an id, try to resolve channel -> guild
+        if len(parts) >= 2 and re.fullmatch(r"\d{17,19}", parts[1]):
+            cid = int(parts[1])
+            ch = client.get_channel(cid)
+            if ch:
+                target_guild = ch.guild
+            else:
+                # try treat id as guild id
+                g = client.get_guild(cid)
+                if g:
+                    target_guild = g
         else:
-            await message.channel.send("❌ I'm not in a voice channel.")
+            # default: current message guild
+            target_guild = message.guild
+
+        if not target_guild:
+            await message.channel.send("❌ Target guild/channel not found or bot not in that guild.")
+            return
+
+        vc = target_guild.voice_client
+        if vc and vc.is_connected():
+            try:
+                await vc.disconnect()
+                await message.channel.send("👋 Left the voice channel.")
+            except Exception as e:
+                await message.channel.send(f"💔 Failed to leave voice: {e}")
+        else:
+            await message.channel.send("❌ I'm not in a voice channel in that guild.")
         return
 
     # ===== SEND IMAGE CROSS-SERVER =====
