@@ -1,6 +1,7 @@
 import discord
 import os
 import re
+import asyncio
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -9,6 +10,12 @@ client = discord.Client(intents=intents)
 
 # ตั้งค่านี้เพื่อเปลี่ยน tolerance ได้ (ค่า 0.10 = 10%)
 TOLERANCE = 0.10
+
+# ============
+# Pixel sound settings (adjust as needed)
+# ============
+PIXEL_SOUND = "sounds/pixel.wav"  # path to your pixel blip sound
+PIXEL_SPEED = 0.05  # default interval between blips (seconds)
 
 # ======================
 # TIERS DATA ...
@@ -220,7 +227,7 @@ def build_update_message(log: dict) -> str:
     out.append(line)
     out.append("")
     out.append("✨ What’s new~ ✨")
-    out.append("૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ა")
+    out.append("૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ા")
     out.append("")
 
     if changes:
@@ -494,6 +501,48 @@ async def send_long_message(channel, text):
 
 
 # ============
+# New helper: play pixel-style sound according to text
+# ============
+async def play_text_sound(vc: discord.VoiceClient, text: str, sound_path: str = PIXEL_SOUND, speed: float = PIXEL_SPEED):
+    """
+    Play the pixel sound sequentially per character to mimic Undertale-style text sounds.
+    - vc: connected VoiceClient in the target guild
+    - text: text to follow (will play per non-space char)
+    - sound_path: path to the small blip sound
+    - speed: seconds to wait between blips (smaller = faster)
+    """
+    if not vc or not vc.is_connected():
+        return
+
+    # safety limit to avoid extremely long texts
+    max_chars = 300
+    play_text = text[:max_chars]
+
+    for ch in play_text:
+        try:
+            if ch.strip() == "":
+                # space => slightly longer pause
+                await asyncio.sleep(speed * 1.5)
+                continue
+
+            if vc.is_playing():
+                vc.stop()
+
+            source = discord.FFmpegPCMAudio(sound_path)
+            vc.play(source)
+            # wait a bit to let the blip play; we keep a short sleep to pace
+            await asyncio.sleep(speed)
+        except Exception:
+            # ignore playback errors silently
+            try:
+                await asyncio.sleep(speed)
+            except Exception:
+                pass
+    # small cooldown
+    await asyncio.sleep(0.02)
+
+
+# ============
 # events
 # ============
 @client.event
@@ -661,6 +710,14 @@ async def on_message(message):
 
         try:
             await channel.send(message_text)
+            # try to play pixel sound in target guild if bot is connected there
+            try:
+                vc = channel.guild.voice_client
+                if vc and vc.is_connected():
+                    await play_text_sound(vc, message_text)
+            except Exception:
+                # ignore sound errors
+                pass
         except Exception as e:
             await message.channel.send(f"💔 Failed to send message: {e}")
             return
