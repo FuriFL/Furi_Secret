@@ -688,7 +688,7 @@ async def on_message(message):
         if not (raw.lower().startswith("takecontrol") and OWNER_ID and message.author.id == OWNER_ID):
             if verb not in TAKE_CONTROL_ALLOWED:
                 await message.channel.send(
-                    "🔒 Take control mode is **enabled** — only limited commands are allowed."
+                    
                 )
                 return
 
