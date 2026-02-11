@@ -10,6 +10,18 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
+# --- Take-control global state ---
+TAKE_CONTROL = False
+TAKE_CONTROL_ALLOWED = {
+    "joinvc",
+    "send",
+    "sendimg",
+    "sendvideo",
+    "leave",
+    "dc",
+    "disconnect",
+}
+
 # ตั้งค่านี้เพื่อเปลี่ยน tolerance ได้ (ค่า 0.10 = 10%)
 TOLERANCE = 0.10
 
@@ -668,6 +680,39 @@ async def on_message(message):
     # normalize spaces
     raw = re.sub(r"\s+", " ", raw).strip()
 
+    # ---------- enforce take-control mode ----------
+    global TAKE_CONTROL
+    if TAKE_CONTROL:
+        verb = raw.split()[0].lower() if raw else ""
+        # allow owner to disable it (owner can still use takecontrol)
+        if not (raw.lower().startswith("takecontrol") and OWNER_ID and message.author.id == OWNER_ID):
+            if verb not in TAKE_CONTROL_ALLOWED:
+                await message.channel.send(
+                    "🔒 Take control mode is **enabled** — only limited commands are allowed."
+                )
+                return
+
+    # ===== TAKECONTROL =====
+    if raw.lower().startswith("takecontrol"):
+        if OWNER_ID and message.author.id != OWNER_ID:
+            await message.channel.send("🔒 Only owner can use takecontrol.")
+            return
+
+        parts = raw.split()
+        if len(parts) < 2:
+            await message.channel.send("Usage: `@FuriBOT takecontrol <on|off>`")
+            return
+
+        if parts[1].lower() in ["on", "enable", "true", "1"]:
+            TAKE_CONTROL = True
+            await message.channel.send("🔐 Take control ENABLED.")
+        elif parts[1].lower() in ["off", "disable", "false", "0"]:
+            TAKE_CONTROL = False
+            await message.channel.send("🔓 Take control DISABLED.")
+        else:
+            await message.channel.send("Use `on` or `off`.")
+        return
+
     # ===== HELP COMMAND =====
     if raw.lower() in ["help", "commands", "cmd", "h"]:
         await message.channel.send(
@@ -799,6 +844,15 @@ async def on_message(message):
             await message.channel.send(f"💔 Failed to join voice: {e}")
         return
 
+    # ===== LEAVE / DISCONNECT =====
+    if raw.lower() in ["leave", "disconnect", "dc"]:
+        vc = message.guild.voice_client
+        if vc and vc.is_connected():
+            await vc.disconnect()
+            await message.channel.send("👋 Left the voice channel.")
+        else:
+            await message.channel.send("❌ I'm not in a voice channel.")
+        return
 
     # ===== SEND IMAGE CROSS-SERVER =====
     # Usage:
@@ -879,6 +933,87 @@ async def on_message(message):
         rep_lines.append(f"✅ Sent: {sent}")
         if skipped:
             rep_lines.append(f"⚠️ Skipped (not images): {', '.join(skipped)}")
+        if failed:
+            rep_lines.append("💔 Failed:")
+            for fn, err in failed:
+                rep_lines.append(f"- {fn}: {err}")
+
+        await send_long_message(message.channel, "\n".join(rep_lines))
+        return
+
+    # ===== SEND VIDEO CROSS-SERVER =====
+    if raw.lower().startswith("sendvideo"):
+        # owner-only
+        if OWNER_ID and message.author.id != OWNER_ID:
+            await message.channel.send("🔒 Permission denied. Only the owner can use `sendvideo`.")
+            return
+
+        parts = raw.split(" ", 2)
+        if len(parts) < 2:
+            await message.channel.send("❌ Usage: `@FuriBOT sendvideo <channel_id>` (attach video files)")
+            return
+
+        # get target channel id
+        target_channel_id = None
+        if re.fullmatch(r"\d{17,19}", parts[1]):
+            target_channel_id = int(parts[1])
+        elif parts[1].startswith("<#") and parts[1].endswith(">"):
+            m = re.search(r"\d+", parts[1])
+            if m:
+                target_channel_id = int(m.group(0))
+        else:
+            await message.channel.send("❌ Invalid channel id. Use numeric channel id or <#channel_mention>.")
+            return
+
+        target_channel = client.get_channel(target_channel_id)
+        if target_channel is None:
+            await message.channel.send("❌ Target channel not found or bot is not in that channel's server.")
+            return
+
+        # require attachments
+        if not message.attachments:
+            await message.channel.send("🎥 Please attach at least one video to relay.")
+            return
+
+        MAX_FILE_SIZE = 25 * 1024 * 1024  # 25 MB default limit
+        sent = 0
+        skipped = []
+        failed = []
+
+        for att in message.attachments:
+            # check if attachment is video
+            is_video = False
+            if att.content_type:
+                is_video = att.content_type.startswith("video")
+            else:
+                fn = att.filename.lower()
+                is_video = any(fn.endswith(ext) for ext in (".mp4", ".mov", ".webm", ".mkv", ".avi"))
+
+            if not is_video:
+                skipped.append(att.filename)
+                continue
+
+            if att.size is not None and att.size > MAX_FILE_SIZE:
+                # too large: send URL instead
+                try:
+                    await target_channel.send(f"📹 Video from **Furi** (file too large to attach): {att.url}")
+                    sent += 1
+                except Exception as e:
+                    failed.append((att.filename, str(e)))
+                continue
+
+            try:
+                file = await att.to_file()
+                await target_channel.send(content=f"📹 Video from **Furi**", file=file)
+                sent += 1
+            except Exception as e:
+                failed.append((att.filename, str(e)))
+
+        # report result
+        rep_lines = []
+        rep_lines.append(f"✅ Sent videos: {sent}")
+        if skipped:
+            rep_lines.append(f"⚠️ Skipped (not videos): {', '.join(skipped)}")
         if failed:
             rep_lines.append("💔 Failed:")
             for fn, err in failed:
