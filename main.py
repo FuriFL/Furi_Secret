@@ -988,18 +988,23 @@ async def on_message(message):
     # ===== TIERLIST / LIST / TOPLIST / WFL / FIND handling (works in AUTO_REPLY or mention) =====
 
     # 1) tierlist commands
-    if cmd.startswith("tierlist"):
-        p = raw.split()
-        # if "tierlist all" -> send text list of all tiers
-        if len(p) >= 2 and p[1].lower() == "all":
-            msgs = build_full_tier_messages()
-            for m in msgs:
-                await send_long_message(message.channel, m)
-            return
-        else:
-            # original code mentions image; here we provide textual fallback hint
-            await message.channel.send("🌸 (tierlist image not configured) Try `@FuriBOT tierlist all` or `@FuriBOT help`.")
-            return
+if cmd.startswith("tierlist"):
+    p = raw.split()
+
+    # tierlist all -> send full text list
+    if len(p) >= 2 and p[1].lower() == "all":
+        msgs = build_full_tier_messages()
+        for m in msgs:
+            await send_long_message(message.channel, m)
+        return
+
+    # default -> send tierlist image
+    try:
+        await message.channel.send(file=discord.File("tierlist.png"))
+    except Exception as e:
+        await message.channel.send(f"Error loading tierlist.png: {e}")
+
+    return
 
     # 2) list <tier> or list all
     if cmd.startswith("list"):
