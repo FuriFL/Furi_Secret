@@ -507,7 +507,7 @@ async def play_text_sound(
     vc: discord.VoiceClient,
     text: str,
     sound_path: str = PIXEL_SOUND,
-    speed: float = 0.045
+    speed: float = 0.04
 ):
 
     if not vc or not vc.is_connected():
@@ -516,35 +516,53 @@ async def play_text_sound(
     if vc.is_playing():
         vc.stop()
 
-    # 🔥 เล่นเสียงแบบ loop ไปเรื่อย ๆ
-    source = discord.FFmpegPCMAudio(
-        sound_path,
-        before_options="-stream_loop -1",
-        options="-loglevel quiet"
-    )
-
-    vc.play(source)
-
     max_chars = 300
     play_text = text[:max_chars]
 
+    async def start_loop():
+        source = discord.FFmpegPCMAudio(
+            sound_path,
+            before_options="-stream_loop -1",
+            options="-loglevel quiet"
+        )
+        vc.play(source)
+
+    async def stop_loop():
+        if vc.is_playing():
+            vc.stop()
+
     for ch in play_text:
 
+        # เว้นวรรค = หยุดสั้น ๆ
         if ch == " ":
-            await asyncio.sleep(speed)
+            await stop_loop()
+            await asyncio.sleep(speed * 1.8)
+            await start_loop()
             continue
 
+        # ขึ้นบรรทัดใหม่
         if ch == "\n":
-            await asyncio.sleep(speed * 2)
+            await stop_loop()
+            await asyncio.sleep(speed * 3)
+            await start_loop()
             continue
 
+        # จบประโยค
         if ch in [".", "!", "?", "…"]:
-            await asyncio.sleep(speed * 3)
+            await stop_loop()
+            await asyncio.sleep(speed * 4)
+            await start_loop()
             continue
+
+        # ถ้ายังไม่เล่น ให้เริ่ม
+        if not vc.is_playing():
+            await start_loop()
 
         await asyncio.sleep(speed)
 
-    vc.stop()
+    # ทำให้ไม่ตัดห้วน
+    await asyncio.sleep(0.1)
+    await stop_loop()
 
 
 
