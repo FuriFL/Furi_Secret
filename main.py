@@ -683,14 +683,12 @@ async def on_message(message):
     # ---------- enforce take-control mode ----------
     global TAKE_CONTROL
     if TAKE_CONTROL:
-        verb = raw.split()[0].lower() if raw else ""
-        # allow owner to disable it (owner can still use takecontrol)
-        if not (raw.lower().startswith("takecontrol") and OWNER_ID and message.author.id == OWNER_ID):
-            if verb not in TAKE_CONTROL_ALLOWED:
-                await message.channel.send(
-                    "🔒 Take control mode is **enabled** — only limited commands are allowed."
-                )
-                return
+    verb = raw.split()[0].lower() if raw else ""
+
+    # allow owner to disable it
+    if not (raw.lower().startswith("takecontrol") and OWNER_ID and message.author.id == OWNER_ID):
+        if verb not in TAKE_CONTROL_ALLOWED:
+            return  # เงียบไปเลย ไม่ส่งข้อความอะไรกลับ
 
     # ===== TAKECONTROL =====
     if raw.lower().startswith("takecontrol"):
