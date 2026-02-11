@@ -498,49 +498,56 @@ async def send_long_message(channel, text):
     if chunk:
         await channel.send("".join(chunk))
 
-
-
 # ============
 # New helper: play pixel-style sound according to text
 # ============
-async def play_text_sound(vc: discord.VoiceClient, text: str, sound_path: str = PIXEL_SOUND, speed: float = PIXEL_SPEED):
+async def play_text_sound(
+    vc: discord.VoiceClient,
+    text: str,
+    sound_path: str = PIXEL_SOUND,
+    speed: float = PIXEL_SPEED
+):
     """
-    Play the pixel sound sequentially per character to mimic Undertale-style text sounds.
-    - vc: connected VoiceClient in the target guild
-    - text: text to follow (will play per non-space char)
-    - sound_path: path to the small blip sound
-    - speed: seconds to wait between blips (smaller = faster)
+    Play pixel sound per character (Undertale-style)
     """
+
     if not vc or not vc.is_connected():
         return
 
-    # safety limit to avoid extremely long texts
+    # จำกัดความยาว ป้องกัน spam เสียง
     max_chars = 300
     play_text = text[:max_chars]
 
     for ch in play_text:
+        # เว้นวรรค = หยุดนานขึ้นนิด
+        if ch.strip() == "":
+            await asyncio.sleep(speed * 1.5)
+            continue
+
         try:
-            if ch.strip() == "":
-                # space => slightly longer pause
-                await asyncio.sleep(speed * 1.5)
-                continue
-
+            # ❌ ไม่ต้อง stop ตัวเองทุกครั้ง
+            # ถ้าเล่นอยู่ ให้รอให้จบเอง
             if vc.is_playing():
-                vc.stop()
+                while vc.is_playing():
+                    await asyncio.sleep(0.005)
 
-            source = discord.FFmpegPCMAudio(sound_path)
+            source = discord.FFmpegPCMAudio(
+                sound_path,
+                options="-loglevel quiet"
+            )
+            
             vc.play(source)
-            # wait a bit to let the blip play; we keep a short sleep to pace
-            await asyncio.sleep(speed)
-        except Exception:
-            # ignore playback errors silently
-            try:
-                await asyncio.sleep(speed)
-            except Exception:
-                pass
-    # small cooldown
-    await asyncio.sleep(0.02)
+            
+            # ⏱️ ต้องให้เวลามันเล่นจริง
+            await asyncio.sleep(speed + 0.05)
 
+        except Exception as e:
+            # กันบอทพัง แต่ไม่ตัด loop
+            print("Voice error:", e)
+            await asyncio.sleep(speed)
+
+    # cool down เล็กน้อย
+    await asyncio.sleep(0.05)
 
 # ============
 # events
