@@ -507,15 +507,14 @@ async def play_text_sound(
     vc: discord.VoiceClient,
     text: str,
     sound_path: str = PIXEL_SOUND,
-    speed: float = PIXEL_SPEED
+    speed: float = 0.045
 ):
     """
-    Play pixel sound per character (Undertale-style)
-    Silent on spaces, longer pause on sentence breaks
+    Undertale-style rapid blip sound
+    Silent on spaces, longer pause on punctuation
     """
 
     if not vc or not vc.is_connected():
-        print("VC not connected")
         return
 
     max_chars = 300
@@ -523,39 +522,41 @@ async def play_text_sound(
 
     for ch in play_text:
 
-        # --------- 1️⃣ เว้นวรรค = เงียบปกติ ----------
+        # เว้นวรรค
         if ch == " ":
             await asyncio.sleep(speed)
             continue
 
-        # --------- 2️⃣ ขึ้นบรรทัดใหม่ ----------
+        # ขึ้นบรรทัดใหม่
         if ch == "\n":
             await asyncio.sleep(speed * 2)
             continue
 
-        # --------- 3️⃣ จบประโยค ----------
+        # จบประโยค
         if ch in [".", "!", "?", "…"]:
-            await asyncio.sleep(speed * 4)
+            await asyncio.sleep(speed * 3)
             continue
 
         try:
-            source = discord.FFmpegPCMAudio(
-                sound_path,
-                options="-loglevel quiet"
+            # ตัดเสียงเก่าทันที (สำคัญมาก)
+            if vc.is_playing():
+                vc.stop()
+
+            vc.play(
+                discord.FFmpegPCMAudio(
+                    sound_path,
+                    options="-loglevel quiet"
+                )
             )
 
-            vc.play(source)
-
+            # ไม่ต้องรอให้เล่นจบ
             await asyncio.sleep(speed)
 
-            while vc.is_playing():
-                await asyncio.sleep(0.01)
-
-        except Exception as e:
-            print("Voice error:", e)
+        except Exception:
             await asyncio.sleep(speed)
 
-    await asyncio.sleep(0.1)
+    await asyncio.sleep(0.05)
+
 
 
 
