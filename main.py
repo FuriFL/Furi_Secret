@@ -692,6 +692,12 @@ async def on_message(message):
                 )
                 return
 
+    # ===== TAKECONTROL =====
+    if raw.lower().startswith("takecontrol"):
+        if OWNER_ID and message.author.id != OWNER_ID:
+            await message.channel.send("🔒 Only owner can use takecontrol.")
+            return
+
         parts = raw.split()
         if len(parts) < 2:
             await message.channel.send("Usage: `@FuriBOT takecontrol <on|off>`")
