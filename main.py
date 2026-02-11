@@ -32,8 +32,7 @@ PIXEL_SOUND = "./PIXEL_SOUND.wav"  # path to your pixel blip sound
 PIXEL_SPEED = 0.7  # default interval between blips (seconds)
 
 # ======================
-# TIERS DATA ...
-# (ใช้ของคุณได้เลย — ผมไม่เปลี่ยนส่วนนี้ ยกเว้นตัวอย่าง alias ที่คุณใส่ไว้)
+# TIERS DATA ... (UNCHANGED)
 # ======================
 TIERS = {
     # ===== U =====
@@ -241,7 +240,7 @@ def build_update_message(log: dict) -> str:
     out.append(line)
     out.append("")
     out.append("✨ What’s new~ ✨")
-    out.append("૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ா")
+    out.append("૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ा")
     out.append("")
 
     if changes:
@@ -596,98 +595,45 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # ======================================
-    # AUTO REPLY ZONE (no mention required)
-    # ======================================
-    AUTO_REPLY_CHANNELS = {1468374226850287619}  # ใส่ channel ID ที่อนุญาต
-    OWNER_ID = 1240907019402219541               # ใส่ user ID ของคุณ (ถ้าไม่ใช้ ลบบรรทัดนี้)
+    # CONFIG: เปลี่ยนให้เป็น set ของ channel ids ที่ต้องการให้ auto-reply ทำงาน (หรือ leave empty เพื่อไม่จำกัด)
+    AUTO_REPLY_CHANNELS = {1468374226850287619}  # ตัวอย่าง: ใส่ channel ID ที่อนุญาต
+    OWNER_ID = 1240907019402219541               # ใส่ user ID ของคุณ (ถ้าไม่ใช้ ให้ตั้งเป็น None)
 
-    if message.channel.id in AUTO_REPLY_CHANNELS:
-        # ถ้าต้องการให้แค่คุณใช้ได้ ให้เปิดเงื่อนไขนี้
-        # if OWNER_ID and message.author.id != OWNER_ID:
-        #     return
+    content = message.content or ""
+    content = content.strip()
 
-        content = message.content.strip()
-        # ถ้ามีแนบรูปแต่ไม่มี text (เช่น ผู้ใช้โพสต์รูปเฉย ๆ) ให้ยังตรวจหา image
-        # แต่ใน AUTO_REPLY เราจะตอบเฉพาะคำสั่งข้อความ/ชื่อเท่านั้น
-        if not content:
-            return
-
-        # try: WFL (my ... for ...)
-        if content.lower().startswith("my ") and " for " in content.lower():
-            reply = wfl_command(content)
-            await message.channel.send(reply)
-            return
-
-        # try: toplist <tier> [N]
-        low = content.lower()
-        parts = low.split()
-
-        if parts and parts[0] == "toplist" and len(parts) >= 2:
-            tier = parts[1].upper()
-            items = get_toplist_by_tier(tier)
-            if not items:
-                await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
-                return
-
-            n = 10
-            if len(parts) >= 3 and parts[2].isdigit():
-                n = max(1, int(parts[2]))
-
-            lines = [
-                f"{i}. • {it['full']} | Value: {it['value']}"
-                for i, it in enumerate(items[:n], start=1)
-            ]
-            await send_long_message(
-                message.channel,
-                f"💮 TOPLIST | Tier {tier} 💮\n\n" + "\n".join(lines)
-            )
-            return
-
-        # try: direct find (พิมพ์ชื่อเฉย ๆ)
-        key, data = find_entry_by_query(content)
-        if data:
-            full_name = data.get("full", key)
-            tier_val = data.get("tier", data.get("SPECIAL", "UNKNOWN"))
-            value_text = data.get("value", "N/A")
-            await message.channel.send(
-                f"**{full_name}** is on **{tier_val}** Tier | Value: **{value_text}**"
-            )
-            return
-
-        # ไม่ตรงอะไร → เงียบ
+    # ไม่สนใจข้อความเปล่า (ก็ยังตรวจ attachments เฉพาะคำสั่ง sendimg/sendvideo)
+    if not content and not message.attachments:
         return
 
-    # ======================================
-    # NORMAL COMMAND ZONE (mention required)
-    # ======================================
-    if client.user not in message.mentions:
+    # ตรวจว่าถูก mention ไหม
+    is_mentioned = client.user in message.mentions
+
+    # We will process commands if either:
+    #  - message is in AUTO_REPLY_CHANNELS  (so users can type plain keywords there)
+    #  - or bot is mentioned (normal commands via mention)
+    can_process = (message.channel.id in AUTO_REPLY_CHANNELS) or is_mentioned
+
+    if not can_process:
         return
 
-    # original content without mention
-    raw = message.content
-
-    # remove mention forms (both plain .mention and <@id>/<@!id>)
-    # keep it robust: remove all occurrences
-    try:
-        # .mention form
-        raw = raw.replace(client.user.mention, "")
-        # <@123...> or <@!123...>
-        raw = re.sub(rf"<@!?\s*{client.user.id}\s*>", "", raw)
-    except Exception:
-        # fallback: try simple regex for any @mention name (less precise)
-        raw = re.sub(rf"<@!?\d+>", "", raw)
-
+    # Prepare command text:
+    # If mentioned, strip mention forms; else use content as-is for auto-reply mode.
+    raw = content
+    if is_mentioned:
+        try:
+            raw = raw.replace(client.user.mention, "")
+            # also remove <@123...> or <@!123...>
+            raw = re.sub(rf"<@!?\s*{client.user.id}\s*>", "", raw)
+        except Exception:
+            raw = re.sub(rf"<@!?\d+>", "", raw)
     raw = raw.strip()
-
-    if not raw:
-        await message.channel.send(
-            "🌸 Heyya! I'm here trying to use `@FuriBOT help` to see all command!"
-        )
-        return
-
-    # normalize spaces
     raw = re.sub(r"\s+", " ", raw).strip()
+
+    # If nothing left after removing mention, send hint (mention mode)
+    if is_mentioned and not raw:
+        await message.channel.send("🌸 Heyya! I'm here trying to use `@FuriBOT help` to see all command!")
+        return
 
     # ---------- enforce take-control mode ----------
     global TAKE_CONTROL
@@ -699,21 +645,25 @@ async def on_message(message):
                 # silent block (do nothing)
                 return
 
+    # Normalize lower command for parsing
+    cmd = raw.lower().strip()
+    parts = cmd.split()
+
     # ===== TAKECONTROL =====
-    if raw.lower().startswith("takecontrol"):
+    if cmd.startswith("takecontrol"):
         if OWNER_ID and message.author.id != OWNER_ID:
             await message.channel.send("🔒 Only owner can use takecontrol.")
             return
 
-        parts = raw.split()
-        if len(parts) < 2:
+        p = raw.split()
+        if len(p) < 2:
             await message.channel.send("Usage: `@FuriBOT takecontrol <on|off>`")
             return
 
-        if parts[1].lower() in ["on", "enable", "true", "1"]:
+        if p[1].lower() in ["on", "enable", "true", "1"]:
             TAKE_CONTROL = True
             await message.channel.send("🔐 Take control ENABLED.")
-        elif parts[1].lower() in ["off", "disable", "false", "0"]:
+        elif p[1].lower() in ["off", "disable", "false", "0"]:
             TAKE_CONTROL = False
             await message.channel.send("🔓 Take control DISABLED.")
         else:
@@ -721,25 +671,33 @@ async def on_message(message):
         return
 
     # ===== HELP COMMAND =====
-    if raw.lower() in ["help", "commands", "cmd", "h"]:
+    if cmd in ["help", "commands", "cmd", "h"]:
         await message.channel.send(
             "🌸 **HELP | FuriBOT** 🌸\n\n"
             "════════════════════\n"
             "📜 **ALL COMMANDS**\n"
             "════════════════════\n\n"
-            "💮 **@FuriBOT tierlist**\n"
-            "→ Show tierlist image\n\n"
-            "💮 **@FuriBOT tierlist all**\n"
-            "→ Show all specs with Tier & Value\n\n"
-            "💮 **@FuriBOT list <tier>**\n"
-            "→ Show all specs in a specific tier\n\n"
-            "💮 **@FuriBOT toplist <tier> [N]**\n"
+            "💮 **tierlist**\n"
+            "→ `tierlist all` shows full list; `tierlist` (image not implemented) \n\n"
+            "💮 **list <tier>** or **list all**\n"
+            "→ Show specs in a tier or all (text)\n\n"
+            "💮 **toplist <tier> [N]**\n"
             "→ Show top N specs in that tier\n\n"
-            "💮 **@FuriBOT find <name>**\n"
+            "💮 **find <name>**\n"
             "→ Find spec Tier & Value\n\n"
-            "💮 **@FuriBOT my <items> for <items>**\n"
-            "→ Check W / F / L by value\n\n"
-            "💮 **@FuriBOT check / update / changelog**\n"
+            "💮 **my <items> for <items>**\n"
+            "→ Check W / F / L by value (e.g. `my ew rgb for ewux4`)\n\n"
+            "💮 **send <channel_id> <message>**\n"
+            "→ Forward message to other channel (owner-only)\n\n"
+            "💮 **sendimg <channel_id>** (attach images)\n"
+            "→ Relay images to another channel (owner-only)\n\n"
+            "💮 **sendvideo <channel_id>** (attach videos)\n"
+            "→ Relay videos to another channel (owner-only)\n\n"
+            "💮 **joinvc <voice_channel_id>**\n"
+            "→ Join voice channel (owner-only)\n\n"
+            "💮 **leave [channel|guild id] / dc / disconnect**\n"
+            "→ Leave voice channel in this guild or a target guild (optional id)\n\n"
+            "💮 **check / update / changelog**\n"
             "→ Show latest update log\n\n"
             "════════════════════"
         )
@@ -747,32 +705,31 @@ async def on_message(message):
 
     # ===== REMOTE SEND (cross-server text) =====
     DEFAULT_REMOTE_CHANNEL_ID = 1468374226850287619  # แก้เป็นค่า default ของคุณ
-    if raw.lower().startswith("send "):
+    if cmd.startswith("send "):
         # owner-only
         if OWNER_ID and message.author.id != OWNER_ID:
             await message.channel.send("🔒 Permission denied. Only the owner can use `send`.")
             return
 
-        parts = raw.split(" ", 2)
-        if len(parts) == 1 or (len(parts) == 2 and not parts[1].strip()):
+        parts_raw = raw.split(" ", 2)
+        if len(parts_raw) == 1 or (len(parts_raw) == 2 and not parts_raw[1].strip()):
             await message.channel.send("❌ Usage: `@FuriBOT send [<channel_id>] <message>`")
             return
 
-        # determine target channel id and message
         target_channel_id = None
         message_text = None
 
-        if len(parts) >= 3 and re.fullmatch(r"\d{17,19}", parts[1]):
+        if len(parts_raw) >= 3 and re.fullmatch(r"\d{17,19}", parts_raw[1]):
             try:
-                target_channel_id = int(parts[1])
-                message_text = parts[2].strip()
+                target_channel_id = int(parts_raw[1])
+                message_text = parts_raw[2].strip()
             except Exception:
                 target_channel_id = None
-        elif len(parts) >= 3 and parts[1].startswith("<#") and parts[1].endswith(">"):
-            m = re.search(r"\d+", parts[1])
+        elif len(parts_raw) >= 3 and parts_raw[1].startswith("<#") and parts_raw[1].endswith(">"):
+            m = re.search(r"\d+", parts_raw[1])
             if m:
                 target_channel_id = int(m.group(0))
-                message_text = parts[2].strip()
+                message_text = parts_raw[2].strip()
         else:
             target_channel_id = DEFAULT_REMOTE_CHANNEL_ID
             message_text = raw[len("send "):].strip()
@@ -788,13 +745,11 @@ async def on_message(message):
 
         try:
             await channel.send(message_text)
-            # try to play pixel sound in target guild if bot is connected there
             try:
                 vc = channel.guild.voice_client
                 if vc and vc.is_connected():
                     await play_text_sound(vc, message_text)
             except Exception:
-                # ignore sound errors
                 pass
         except Exception as e:
             await message.channel.send(f"💔 Failed to send message: {e}")
@@ -804,28 +759,21 @@ async def on_message(message):
         return
 
     # ===== JOIN VOICE CROSS-SERVER =====
-    # Usage:
-    #  - @FuriBOT joinvc <voice_channel_id>
-    # Notes:
-    #  - Bot must already be a member of the target guild
-    #  - Owner-only
-    if raw.lower().startswith("joinvc"):
-        # owner-only
+    if cmd.startswith("joinvc"):
         if OWNER_ID and message.author.id != OWNER_ID:
             await message.channel.send("🔒 Permission denied. Only the owner can use `joinvc`.")
             return
 
-        parts = raw.split()
-        if len(parts) < 2:
+        p = raw.split()
+        if len(p) < 2:
             await message.channel.send("❌ Usage: `@FuriBOT joinvc <voice_channel_id>`")
             return
 
-        # parse channel id (numeric or mention style)
         voice_channel_id = None
-        if re.fullmatch(r"\d{17,19}", parts[1]):
-            voice_channel_id = int(parts[1])
-        elif parts[1].startswith("<#") and parts[1].endswith(">"):
-            m = re.search(r"\d+", parts[1])
+        if re.fullmatch(r"\d{17,19}", p[1]):
+            voice_channel_id = int(p[1])
+        elif p[1].startswith("<#") and p[1].endswith(">"):
+            m = re.search(r"\d+", p[1])
             if m:
                 voice_channel_id = int(m.group(0))
         else:
@@ -837,7 +785,6 @@ async def on_message(message):
             await message.channel.send("❌ Voice channel not found or bot is not in that channel's server.")
             return
 
-        # ensure it's a voice channel (also accept StageChannel)
         if not isinstance(channel, (discord.VoiceChannel, discord.StageChannel)):
             await message.channel.send("❌ The provided ID is not a voice channel.")
             return
@@ -852,26 +799,23 @@ async def on_message(message):
         return
 
     # ===== LEAVE / DISCONNECT (supports optional channel/guild id to leave across servers) =====
-    if raw.lower().startswith("leave") or raw.lower().startswith("disconnect") or raw.lower().startswith("dc"):
-        parts = raw.split()
+    if cmd.startswith("leave") or cmd.startswith("disconnect") or cmd.startswith("dc"):
+        p = raw.split()
         target_guild = None
-        # if given an id, try to resolve channel -> guild
-        if len(parts) >= 2 and re.fullmatch(r"\d{17,19}", parts[1]):
-            cid = int(parts[1])
+        if len(p) >= 2 and re.fullmatch(r"\d{17,19}", p[1]):
+            cid = int(p[1])
             ch = client.get_channel(cid)
             if ch:
                 target_guild = ch.guild
             else:
-                # try treat id as guild id
                 g = client.get_guild(cid)
                 if g:
                     target_guild = g
         else:
-            # default: current message guild
             target_guild = message.guild
 
         if not target_guild:
-            await message.channel.send("❌ Target guild/channel not found or bot not in that guild.")
+            await message.channel.send("❌ Target server/channel not found or bot not in that server.")
             return
 
         vc = target_guild.voice_client
@@ -886,26 +830,21 @@ async def on_message(message):
         return
 
     # ===== SEND IMAGE CROSS-SERVER =====
-    # Usage:
-    #  - @FuriBOT sendimg <channel_id> (attach images)
-    #  - channel_id can be ID or channel mention <#id>
-    if raw.lower().startswith("sendimg"):
-        # owner-only
+    if cmd.startswith("sendimg"):
         if OWNER_ID and message.author.id != OWNER_ID:
             await message.channel.send("🔒 Permission denied. Only the owner can use `sendimg`.")
             return
 
-        parts = raw.split(" ", 2)
-        if len(parts) < 2:
+        parts_raw = raw.split(" ", 2)
+        if len(parts_raw) < 2:
             await message.channel.send("❌ Usage: `@FuriBOT sendimg <channel_id>` (attach image files)")
             return
 
-        # get target channel id
         target_channel_id = None
-        if re.fullmatch(r"\d{17,19}", parts[1]):
-            target_channel_id = int(parts[1])
-        elif parts[1].startswith("<#") and parts[1].endswith(">"):
-            m = re.search(r"\d+", parts[1])
+        if re.fullmatch(r"\d{17,19}", parts_raw[1]):
+            target_channel_id = int(parts_raw[1])
+        elif parts_raw[1].startswith("<#") and parts_raw[1].endswith(">"):
+            m = re.search(r"\d+", parts_raw[1])
             if m:
                 target_channel_id = int(m.group(0))
         else:
@@ -917,7 +856,6 @@ async def on_message(message):
             await message.channel.send("❌ Target channel not found or bot is not in that channel's server.")
             return
 
-        # require attachments
         if not message.attachments:
             await message.channel.send("🖼️ Please attach at least one image to relay.")
             return
@@ -928,12 +866,10 @@ async def on_message(message):
         failed = []
 
         for att in message.attachments:
-            # check if attachment is image (some clients set content_type)
             is_image = False
             if att.content_type:
                 is_image = att.content_type.startswith("image")
             else:
-                # fallback: check filename extension
                 fn = att.filename.lower()
                 is_image = any(fn.endswith(ext) for ext in (".png", ".jpg", ".jpeg", ".gif", ".webp"))
 
@@ -941,9 +877,7 @@ async def on_message(message):
                 skipped.append(att.filename)
                 continue
 
-            # size check
             if att.size is not None and att.size > MAX_FILE_SIZE:
-                # too large: send URL instead of file
                 try:
                     await target_channel.send(f"🟣 Image from **Furi** (file too large to attach): {att.url}")
                     sent += 1
@@ -951,7 +885,6 @@ async def on_message(message):
                     failed.append((att.filename, str(e)))
                 continue
 
-            # try to forward as file
             try:
                 file = await att.to_file()
                 await target_channel.send(content=f"🟣 Image from **Furi**", file=file)
@@ -959,7 +892,6 @@ async def on_message(message):
             except Exception as e:
                 failed.append((att.filename, str(e)))
 
-        # report result
         rep_lines = []
         rep_lines.append(f"✅ Sent: {sent}")
         if skipped:
@@ -973,23 +905,21 @@ async def on_message(message):
         return
 
     # ===== SEND VIDEO CROSS-SERVER =====
-    if raw.lower().startswith("sendvideo"):
-        # owner-only
+    if cmd.startswith("sendvideo"):
         if OWNER_ID and message.author.id != OWNER_ID:
             await message.channel.send("🔒 Permission denied. Only the owner can use `sendvideo`.")
             return
 
-        parts = raw.split(" ", 2)
-        if len(parts) < 2:
+        parts_raw = raw.split(" ", 2)
+        if len(parts_raw) < 2:
             await message.channel.send("❌ Usage: `@FuriBOT sendvideo <channel_id>` (attach video files)")
             return
 
-        # get target channel id
         target_channel_id = None
-        if re.fullmatch(r"\d{17,19}", parts[1]):
-            target_channel_id = int(parts[1])
-        elif parts[1].startswith("<#") and parts[1].endswith(">"):
-            m = re.search(r"\d+", parts[1])
+        if re.fullmatch(r"\d{17,19}", parts_raw[1]):
+            target_channel_id = int(parts_raw[1])
+        elif parts_raw[1].startswith("<#") and parts_raw[1].endswith(">"):
+            m = re.search(r"\d+", parts_raw[1])
             if m:
                 target_channel_id = int(m.group(0))
         else:
@@ -1001,7 +931,6 @@ async def on_message(message):
             await message.channel.send("❌ Target channel not found or bot is not in that channel's server.")
             return
 
-        # require attachments
         if not message.attachments:
             await message.channel.send("🎥 Please attach at least one video to relay.")
             return
@@ -1012,7 +941,6 @@ async def on_message(message):
         failed = []
 
         for att in message.attachments:
-            # check if attachment is video
             is_video = False
             if att.content_type:
                 is_video = att.content_type.startswith("video")
@@ -1025,9 +953,8 @@ async def on_message(message):
                 continue
 
             if att.size is not None and att.size > MAX_FILE_SIZE:
-                # too large: send URL instead
                 try:
-                    await target_channel.send(f"📹 Video from **Furi** (file too large to attach): {att.url}")
+                    await target_channel.send(f"🟣 Video from **Furi** (file too large to attach): {att.url}")
                     sent += 1
                 except Exception as e:
                     failed.append((att.filename, str(e)))
@@ -1035,12 +962,11 @@ async def on_message(message):
 
             try:
                 file = await att.to_file()
-                await target_channel.send(content=f"📹 Video from **Furi**", file=file)
+                await target_channel.send(content=f"🟣 Video from **Furi**", file=file)
                 sent += 1
             except Exception as e:
                 failed.append((att.filename, str(e)))
 
-        # report result
         rep_lines = []
         rep_lines.append(f"✅ Sent videos: {sent}")
         if skipped:
@@ -1054,28 +980,102 @@ async def on_message(message):
         return
 
     # ===== UPDATE LOG =====
-    if raw.lower() in ["check", "update", "changelog"]:
+    if cmd in ["check", "update", "changelog"]:
         text = build_update_message(UPDATE_LOG)
         await send_long_message(message.channel, text)
         return
 
-    # ===== FIND =====
-    parts = raw.split(" ", 1)
-    if parts[0].lower() == "find" and len(parts) > 1:
-        query_raw = parts[1].strip()
+    # ===== TIERLIST / LIST / TOPLIST / WFL / FIND handling (works in AUTO_REPLY or mention) =====
+
+    # 1) tierlist commands
+    if cmd.startswith("tierlist"):
+        p = raw.split()
+        # if "tierlist all" -> send text list of all tiers
+        if len(p) >= 2 and p[1].lower() == "all":
+            msgs = build_full_tier_messages()
+            for m in msgs:
+                await send_long_message(message.channel, m)
+            return
+        else:
+            # original code mentions image; here we provide textual fallback hint
+            await message.channel.send("🌸 (tierlist image not configured) Try `@FuriBOT tierlist all` or `@FuriBOT help`.")
+            return
+
+    # 2) list <tier> or list all
+    if cmd.startswith("list"):
+        p = raw.split()
+        if len(p) >= 2:
+            if p[1].lower() in ["all", "everything"]:
+                msgs = build_full_tier_messages()
+                for m in msgs:
+                    await send_long_message(message.channel, m)
+                return
+            else:
+                tier = p[1].upper()
+                items = get_toplist_by_tier(tier)
+                if not items:
+                    await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
+                    return
+                lines = [f"{i}. • {it['full']} | Value: {it['value']}" for i, it in enumerate(items, start=1)]
+                await send_long_message(message.channel, f"💮 LIST | Tier {tier} 💮\n\n" + "\n".join(lines))
+                return
+        else:
+            await message.channel.send("❌ Usage: `@FuriBOT list <tier>` or `@FuriBOT list all`")
+            return
+
+    # 3) toplist <tier> [N]
+    if parts and parts[0] == "toplist" and len(parts) >= 2:
+        tier = parts[1].upper()
+        items = get_toplist_by_tier(tier)
+        if not items:
+            await message.channel.send(f"⚠️ No specs found for tier **{tier}**")
+            return
+
+        n = 10
+        if len(parts) >= 3 and parts[2].isdigit():
+            n = max(1, int(parts[2]))
+
+        lines = [f"{i}. • {it['full']} | Value: {it['value']}" for i, it in enumerate(items[:n], start=1)]
+        await send_long_message(message.channel, f"💮 TOPLIST | Tier {tier} 💮\n\n" + "\n".join(lines))
+        return
+
+    # 4) my ... for ...
+    low_content = raw.lower()
+    if low_content.startswith("my ") and " for " in low_content:
+        reply = wfl_command(raw)
+        await message.channel.send(reply)
+        return
+
+    # 5) direct find (พิมพ์ชื่อเฉย ๆ) in AUTO_REPLY mode: if channel is auto-reply zone and text is short
+    # Also support explicit "find <name>" when mentioned
+    if cmd.startswith("find "):
+        query_raw = raw.split(" ", 1)[1].strip()
         key, data = find_entry_by_query(query_raw)
         if data:
             full_name = data.get("full", key)
             tier_val = data.get("tier", data.get("SPECIAL", "UNKNOWN"))
             value_text = data.get("value", "N/A")
-            await message.channel.send(
-                f"**{full_name}** (key: {key}) is on **{tier_val}** Tier | Value: **{value_text}**"
-            )
+            await message.channel.send(f"**{full_name}** (key: {key}) is on **{tier_val}** Tier | Value: **{value_text}**")
         else:
             await message.channel.send(f"💔 Sorry, I don't know **{query_raw}**")
         return
 
-    await message.channel.send("🌸 Need help? Try `@FuriBOT help` to see all commands!")
+    # If in AUTO_REPLY_CHANNELS and user just typed a single token (name), try direct find
+    if message.channel.id in AUTO_REPLY_CHANNELS and len(parts) == 1:
+        key, data = find_entry_by_query(raw)
+        if data:
+            full_name = data.get("full", key)
+            tier_val = data.get("tier", data.get("SPECIAL", "UNKNOWN"))
+            value_text = data.get("value", "N/A")
+            await message.channel.send(f"**{full_name}** is on **{tier_val}** Tier | Value: **{value_text}**")
+            return
+
+    # Fallback - if bot was mentioned give help hint; otherwise stay quiet in auto-reply mode
+    if is_mentioned:
+        await message.channel.send("🌸 Need help? Try `@FuriBOT help` to see all commands!")
+    else:
+        # silent fallback for auto-reply (do nothing)
+        return
 
 
 # ============
