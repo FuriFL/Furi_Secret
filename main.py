@@ -658,7 +658,7 @@ async def on_message(message):
         # ไม่ตรงอะไร → เงียบ
         return
 
-    ======================================
+    # ======================================
     # NORMAL COMMAND ZONE (mention required)
     # ======================================
     if client.user not in message.mentions:
