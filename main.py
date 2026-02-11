@@ -15,7 +15,7 @@ TOLERANCE = 0.10
 # Pixel sound settings (adjust as needed)
 # ============
 PIXEL_SOUND = "./PIXEL_SOUND.wav"  # path to your pixel blip sound
-PIXEL_SPEED = 0.05  # default interval between blips (seconds)
+PIXEL_SPEED = 0.06  # default interval between blips (seconds)
 
 # ======================
 # TIERS DATA ...
@@ -512,6 +512,7 @@ async def play_text_sound(
     """
 
     if not vc or not vc.is_connected():
+        print("VC not connected")
         return
 
     # จำกัดความยาว ป้องกัน spam เสียง
@@ -525,21 +526,20 @@ async def play_text_sound(
             continue
 
         try:
-            # ❌ ไม่ต้อง stop ตัวเองทุกครั้ง
-            # ถ้าเล่นอยู่ ให้รอให้จบเอง
-            if vc.is_playing():
-                while vc.is_playing():
-                    await asyncio.sleep(0.005)
-
+            # สร้าง source ใหม่ทุกตัวอักษร
             source = discord.FFmpegPCMAudio(
                 sound_path,
                 options="-loglevel quiet"
             )
-            
+
             vc.play(source)
-            
-            # ⏱️ ต้องให้เวลามันเล่นจริง
-            await asyncio.sleep(speed + 0.05)
+
+            # ⏱️ ให้เวลาเสียงเริ่ม + เล่น
+            await asyncio.sleep(speed)
+
+            # รอให้เสียงจบจริง (สำคัญมาก)
+            while vc.is_playing():
+                await asyncio.sleep(0.01)
 
         except Exception as e:
             # กันบอทพัง แต่ไม่ตัด loop
@@ -547,7 +547,8 @@ async def play_text_sound(
             await asyncio.sleep(speed)
 
     # cool down เล็กน้อย
-    await asyncio.sleep(0.05)
+    await asyncio.sleep(0.1)
+
 
 # ============
 # events
