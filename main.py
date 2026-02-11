@@ -2,6 +2,8 @@ import discord
 import os
 import re
 import asyncio
+import shutil
+print("FFMPEG:", shutil.which("ffmpeg"))
 
 intents = discord.Intents.default()
 intents.message_content = True
