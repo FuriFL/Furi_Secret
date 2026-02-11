@@ -17,7 +17,7 @@ TOLERANCE = 0.10
 # Pixel sound settings (adjust as needed)
 # ============
 PIXEL_SOUND = "./PIXEL_SOUND.wav"  # path to your pixel blip sound
-PIXEL_SPEED = 0.03  # default interval between blips (seconds)
+PIXEL_SPEED = 0.01  # default interval between blips (seconds)
 
 # ======================
 # TIERS DATA ...
