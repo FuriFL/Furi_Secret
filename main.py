@@ -17,7 +17,7 @@ TOLERANCE = 0.10
 # Pixel sound settings (adjust as needed)
 # ============
 PIXEL_SOUND = "./PIXEL_SOUND.wav"  # path to your pixel blip sound
-PIXEL_SPEED = 0.7  # default interval between blips (seconds)
+PIXEL_SPEED = 0.5  # default interval between blips (seconds)
 
 # ======================
 # TIERS DATA ...
@@ -799,16 +799,6 @@ async def on_message(message):
             await message.channel.send(f"💔 Failed to join voice: {e}")
         return
 
-
-
-    if raw.lower() in ["leave", "disconnect", "dc"]:
-    vc = message.guild.voice_client
-    if vc and vc.is_connected():
-        await vc.disconnect()
-        await message.channel.send("👋 Left the voice channel.")
-    else:
-        await message.channel.send("❌ I'm not in a voice channel.")
-    return
 
     # ===== SEND IMAGE CROSS-SERVER =====
     # Usage:
