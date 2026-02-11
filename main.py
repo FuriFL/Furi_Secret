@@ -509,53 +509,43 @@ async def play_text_sound(
     sound_path: str = PIXEL_SOUND,
     speed: float = 0.045
 ):
-    """
-    Undertale-style rapid blip sound
-    Silent on spaces, longer pause on punctuation
-    """
 
     if not vc or not vc.is_connected():
         return
+
+    if vc.is_playing():
+        vc.stop()
+
+    # 🔥 เล่นเสียงแบบ loop ไปเรื่อย ๆ
+    source = discord.FFmpegPCMAudio(
+        sound_path,
+        before_options="-stream_loop -1",
+        options="-loglevel quiet"
+    )
+
+    vc.play(source)
 
     max_chars = 300
     play_text = text[:max_chars]
 
     for ch in play_text:
 
-        # เว้นวรรค
         if ch == " ":
             await asyncio.sleep(speed)
             continue
 
-        # ขึ้นบรรทัดใหม่
         if ch == "\n":
             await asyncio.sleep(speed * 2)
             continue
 
-        # จบประโยค
         if ch in [".", "!", "?", "…"]:
             await asyncio.sleep(speed * 3)
             continue
 
-        try:
-            # ตัดเสียงเก่าทันที (สำคัญมาก)
-            if vc.is_playing():
-                vc.stop()
+        await asyncio.sleep(speed)
 
-            vc.play(
-                discord.FFmpegPCMAudio(
-                    sound_path,
-                    options="-loglevel quiet"
-                )
-            )
+    vc.stop()
 
-            # ไม่ต้องรอให้เล่นจบ
-            await asyncio.sleep(speed)
-
-        except Exception:
-            await asyncio.sleep(speed)
-
-    await asyncio.sleep(0.05)
 
 
 
