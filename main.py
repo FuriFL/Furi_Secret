@@ -561,7 +561,7 @@ async def play_text_sound(
         await asyncio.sleep(speed)
 
     # ทำให้ไม่ตัดห้วน
-    await asyncio.sleep(0.1)
+    await asyncio.sleep(0.90)
     await stop_loop()
 
 
