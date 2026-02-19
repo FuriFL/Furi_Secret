@@ -597,7 +597,7 @@ async def on_message(message):
 
     # CONFIG: เปลี่ยนให้เป็น set ของ channel ids ที่ต้องการให้ auto-reply ทำงาน (หรือ leave empty เพื่อไม่จำกัด)
     AUTO_REPLY_CHANNELS = {1468374226850287619}  # ตัวอย่าง: ใส่ channel ID ที่อนุญาต
-    OWNER_ID = 1471586942352359621               # ใส่ user ID ของคุณ (ถ้าไม่ใช้ ให้ตั้งเป็น None)
+    OWNER_ID = 1464556689784176704               # ใส่ user ID ของคุณ (ถ้าไม่ใช้ ให้ตั้งเป็น None)
 
     content = message.content or ""
     content = content.strip()
