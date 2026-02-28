@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 
+TOKEN = "TOKEN"
+
 TARGET_GUILD_ID = 1473379988190400595  # เซิร์ฟ B (ที่มี role อยู่)
 
 intents = discord.Intents.default()
