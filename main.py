@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
+import os
 
-TOKEN = "MTQ2ODM2MDUwODY5MTQ0ODAwMQ.Gv1-mQ.Ug4Pjj5cn83uqFPhKRAHcHm1SzOPchkNhN3-II"
+TOKEN = os.getenv("TOKEN")
 
 TARGET_GUILD_ID = 1473379988190400595  # เซิร์ฟ B (ที่มี role อยู่)
 
